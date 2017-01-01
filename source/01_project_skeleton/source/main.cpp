@@ -66,7 +66,7 @@ static void LoadTriangle() {
         //  X     Y     Z
          0.0f, 0.8f, 0.0f,
         -0.8f,-0.8f, 0.0f,
-         0.8f,-0.8f, 0.0f,
+         0.2f,-0.2f, 0.0f,
     };
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW);
     
