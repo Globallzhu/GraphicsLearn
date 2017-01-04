@@ -38,79 +38,123 @@ const glm::vec2 SCREEN_SIZE(800, 600);
 // globals
 GLFWwindow* gWindow = NULL;
 tdogl::Program* gProgram = NULL;
-GLuint gVAO = 0;
-GLuint gVBO = 0;
+GLuint VAO = 0;
+GLuint VBO = 0;
+GLuint EBO = 0;
+GLint shaderProgram = 0;
 
-const GLchar* vertexShaderCode = "#version 330 core/n"
-	"layout(location = 0) in vec3 vertPos;/n"
-	"void main() {/n"
-		"gl_Position = vec4(vertPos, 1);/n"
-	"}/n";
+const GLchar* vertexShaderCode = "#version 330 core\n"
+	"layout(location = 0) in vec3 vertPos;\n"
+	"void main() {\n"
+		"gl_Position = vec4(vertPos, 1);\n"
+	"}\n";
 
-const GLchar* fragmentShaderCode = "#version 330 core/n"
-"out vec4 vertColor;/n"
-"void main() {/n"
-"vertColor = vec4(0.2, 0.4, 0.3, 1.0);/n"
-"}/n";
+const GLchar* fragmentShaderCode = "#version 330\n"
+"out vec4 vertColor;\n"
+"void main() {\n"
+"vertColor = vec4(0.2, 0.4, 0.3, 1.0);\n"
+"}\n";
 
 // loads the vertex shader and fragment shader, and links them to make the global gProgram
-static void LoadShaders() {
+void LoadShaders() {
     std::vector<tdogl::Shader> shaders;
     shaders.push_back(tdogl::Shader::shaderFromFile(ResourcePath("vertex-shader.txt"), GL_VERTEX_SHADER));
     shaders.push_back(tdogl::Shader::shaderFromFile(ResourcePath("fragment-shader.txt"), GL_FRAGMENT_SHADER));
     gProgram = new tdogl::Program(shaders);
 }
 
-
-// loads a triangle into the VAO global
-static void LoadTriangle() {
-	// 标准化设备坐标（范围：-1.0~1.0）
-	GLfloat triangle_vertexs[] = {
-		-0.5, -0.5, 0,
-		0.5, -0.5, 0,
-		0, 0.5, 0
-	};
-
-	//初始化顶点缓冲对象
-	GLuint VBO;
-	glGenBuffers(1, &VBO);
-	//绑定VBO到GL_ARRAY_BUFFER
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	//复制顶点数据到array_buffer缓冲
-	glBufferData(GL_ARRAY_BUFFER,sizeof(triangle_vertexs), triangle_vertexs, GL_STATIC_DRAW);
-
-	//创建顶点shader并编译
-	GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertex_shader, 1, &vertexShaderCode, nullptr);
-	glCompileShader(vertex_shader);
+//创建一个shader
+GLuint createShader(const GLenum in_shaderType, const char* in_shaderCode) {
+	GLuint out_shader = glCreateShader(in_shaderType);
+	glShaderSource(out_shader, 1, &in_shaderCode, nullptr);
+	glCompileShader(out_shader);
 	GLint success;
 	GLchar infoLog[512];
-	glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success);
-	if (!success){
-		glGetShaderInfoLog(vertex_shader, 512, nullptr, infoLog);
+	glGetShaderiv(out_shader, GL_COMPILE_STATUS, &success);
+	if (!success) {
+		glGetShaderInfoLog(out_shader, 512, nullptr, infoLog);
 		std::cout << "Compile shader error:" << infoLog << std::endl;
 	}
+	return out_shader;
+}
 
-	//创建片段shader并编译
-	GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragment_shader, 1, &fragmentShaderCode, nullptr);
-	glCompileShader(fragment_shader);
-	glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success);
+//创建一个shader program
+GLint createShaderProgram(GLuint in_vertex_shader, GLuint in_fragment_shader) {
+	GLint out_program = glCreateProgram();
+	glAttachShader(out_program, in_vertex_shader);
+	glAttachShader(out_program, in_fragment_shader);
+	glLinkProgram(out_program);
+	GLint success;
+	GLchar infoLog[512];
+	glGetProgramiv(out_program, GL_LINK_STATUS, &success);
 	if (!success) {
-		glGetShaderInfoLog(fragment_shader, 512, nullptr, infoLog);
-		std::cout << "Compile shader error:" << infoLog << std::endl;
-	}
-
-	//创建着色器程序并链接
-	GLint shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertex_shader);
-	glAttachShader(shaderProgram, fragment_shader);
-	glLinkProgram(shaderProgram);
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if (!success) {
-		glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
+		glGetProgramInfoLog(out_program, 512, nullptr, infoLog);
 		std::cout << "Link shader error:" << infoLog << std::endl;
 	}
+
+	glDeleteShader(in_vertex_shader);
+	glDeleteShader(in_fragment_shader);
+
+	return out_program;
+}
+
+// loads a triangle into the VAO global
+void LoadTriangle() {
+	// 标准化设备坐标（范围：-1.0~1.0）
+	//GLfloat triangle_vertexs[] = {
+	//	-0.5, -0.5, 0,
+	//	0.5, -0.5, 0,
+	//	0, 0.5, 0
+	//};
+
+	GLfloat triangle_vertexs[] = {
+		-0.5, -0.5, 0,		//左下角
+		-0.5, 0.5, 0,		//左上角
+		0.5, 0.5, 0,		//右上角
+		0.5, -0.5, 0		//右下角
+	};
+
+	GLuint indexs[] = {
+		0,1,2,
+		0,2,3
+	};
+
+	//初始化顶点数组对象
+	glGenVertexArrays(1, &VAO);
+	//1.绑定顶点数组对象
+	glBindVertexArray(VAO);
+
+	//初始化顶点缓冲对象
+	glGenBuffers(1, &VBO);
+	//2.绑定VBO到GL_ARRAY_BUFFER
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	//复制顶点数据到array_buffer缓冲
+	glBufferData(GL_ARRAY_BUFFER, sizeof(triangle_vertexs), triangle_vertexs, GL_STATIC_DRAW);
+
+	//初始化索引缓冲对象
+	glGenBuffers(1, &EBO);
+	//3.绑定EBO到GL_ELEMENT_ARRAY_BUFFER
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexs), indexs, GL_STATIC_DRAW);
+
+	//4.设置顶点属性指针
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+	glEnableVertexAttribArray(0);
+
+	//5.解绑VA0
+	glBindVertexArray(0);
+
+	//创建顶点shader并编译
+	GLuint vertex_shader = createShader(GL_VERTEX_SHADER, vertexShaderCode);
+
+	//创建片段shader并编译
+	GLuint fragment_shader = createShader(GL_FRAGMENT_SHADER, fragmentShaderCode);
+
+	//创建着色器程序并链接
+	shaderProgram = createShaderProgram(vertex_shader, fragment_shader);
+
+	//线框模式
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 
 
@@ -119,6 +163,13 @@ static void Render() {
     // clear everything
 	glClear(GL_COLOR_BUFFER_BIT);
     
+	glUseProgram(shaderProgram);
+	//绑定VAO的同时也会自动绑定EBO
+	glBindVertexArray(VAO);
+	//glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+
     // swap the display buffers (displays what was just drawn)
     glfwSwapBuffers(gWindow);
 }
