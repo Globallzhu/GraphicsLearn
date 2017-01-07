@@ -1,21 +1,3 @@
-/*
- main
-
- Copyright 2012 Thomas Dalling - http://tomdalling.com/
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-     http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
- */
-
 #include "platform.hpp"
 
 // third-party libraries
@@ -29,90 +11,59 @@
 #include <stdexcept>
 #include <cmath>
 
-// tdogl classes
-#include "Program.h"
+#include "LShader.h"
 
 // constants
 const glm::vec2 SCREEN_SIZE(800, 600);
 
 // globals
 GLFWwindow* gWindow = NULL;
-tdogl::Program* gProgram = NULL;
 GLuint VAO = 0;
 GLuint VBO = 0;
 GLuint EBO = 0;
-GLint shaderProgram = 0;
+LShader g_LShaderObj;
 
 const GLchar* vertexShaderCode = "#version 330 core\n"
 	"layout(location = 0) in vec3 vertPos;\n"
+	"layout(location = 1) in vec3 vertColor;\n"
+	"out vec4 finalColor;\n"
 	"void main() {\n"
-		"gl_Position = vec4(vertPos, 1);\n"
+	"gl_Position = vec4(vertPos, 1.0);\n"
+	"finalColor = vec4(vertColor, 1.0);\n"
 	"}\n";
 
 const GLchar* fragmentShaderCode = "#version 330\n"
-"out vec4 vertColor;\n"
-"void main() {\n"
-"vertColor = vec4(0.2, 0.4, 0.3, 1.0);\n"
-"}\n";
+	"in vec4 finalColor;\n"
+	"uniform vec4 uf_color;\n"
+	"out vec4 vertColor;\n"
+	"void main() {\n"
+	"vertColor = finalColor;\n"
+	"}\n";
 
 // loads the vertex shader and fragment shader, and links them to make the global gProgram
 void LoadShaders() {
-    std::vector<tdogl::Shader> shaders;
-    shaders.push_back(tdogl::Shader::shaderFromFile(ResourcePath("vertex-shader.txt"), GL_VERTEX_SHADER));
-    shaders.push_back(tdogl::Shader::shaderFromFile(ResourcePath("fragment-shader.txt"), GL_FRAGMENT_SHADER));
-    gProgram = new tdogl::Program(shaders);
-}
-
-//创建一个shader
-GLuint createShader(const GLenum in_shaderType, const char* in_shaderCode) {
-	GLuint out_shader = glCreateShader(in_shaderType);
-	glShaderSource(out_shader, 1, &in_shaderCode, nullptr);
-	glCompileShader(out_shader);
-	GLint success;
-	GLchar infoLog[512];
-	glGetShaderiv(out_shader, GL_COMPILE_STATUS, &success);
-	if (!success) {
-		glGetShaderInfoLog(out_shader, 512, nullptr, infoLog);
-		std::cout << "Compile shader error:" << infoLog << std::endl;
-	}
-	return out_shader;
-}
-
-//创建一个shader program
-GLint createShaderProgram(GLuint in_vertex_shader, GLuint in_fragment_shader) {
-	GLint out_program = glCreateProgram();
-	glAttachShader(out_program, in_vertex_shader);
-	glAttachShader(out_program, in_fragment_shader);
-	glLinkProgram(out_program);
-	GLint success;
-	GLchar infoLog[512];
-	glGetProgramiv(out_program, GL_LINK_STATUS, &success);
-	if (!success) {
-		glGetProgramInfoLog(out_program, 512, nullptr, infoLog);
-		std::cout << "Link shader error:" << infoLog << std::endl;
-	}
-
-	glDeleteShader(in_vertex_shader);
-	glDeleteShader(in_fragment_shader);
-
-	return out_program;
+    //std::vector<tdogl::Shader> shaders;
+    //shaders.push_back(tdogl::Shader::shaderFromFile(ResourcePath("vertex-shader.txt"), GL_VERTEX_SHADER));
+    //shaders.push_back(tdogl::Shader::shaderFromFile(ResourcePath("fragment-shader.txt"), GL_FRAGMENT_SHADER));
+    //gProgram = new tdogl::Program(shaders);
 }
 
 // loads a triangle into the VAO global
 void LoadTriangle() {
 	// 标准化设备坐标（范围：-1.0~1.0）
-	//GLfloat triangle_vertexs[] = {
-	//	-0.5, -0.5, 0,
-	//	0.5, -0.5, 0,
-	//	0, 0.5, 0
-	//};
-
 	GLfloat triangle_vertexs[] = {
-		-0.5, -0.5, 0,		//左下角
-		-0.5, 0.5, 0,		//左上角
-		0.5, 0.5, 0,		//右上角
-		0.5, -0.5, 0		//右下角
+		//位置              颜色
+		-0.5, -0.5, 0,		1.0, 0.0, 0.0, 
+		0.5, -0.5, 0,		0.0, 1.0, 0.0,
+		0, 0.5, 0,			0.0, 0.0, 1.0
 	};
+
+	//GLfloat triangle_vertexs[] = {
+	//	-0.5, -0.5, 0,		//左下角
+	//	-0.5, 0.5, 0,		//左上角
+	//	0.5, 0.5, 0,		//右上角
+	//	0.5, -0.5, 0		//右下角
+	//};
 
 	GLuint indexs[] = {
 		0,1,2,
@@ -137,24 +88,26 @@ void LoadTriangle() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexs), indexs, GL_STATIC_DRAW);
 
-	//4.设置顶点属性指针
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+	//4.设置顶点属性指针（位置）
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
+	//设置顶点属性指针（颜色）
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
 
 	//5.解绑VA0
 	glBindVertexArray(0);
 
-	//创建顶点shader并编译
-	GLuint vertex_shader = createShader(GL_VERTEX_SHADER, vertexShaderCode);
-
-	//创建片段shader并编译
-	GLuint fragment_shader = createShader(GL_FRAGMENT_SHADER, fragmentShaderCode);
-
-	//创建着色器程序并链接
-	shaderProgram = createShaderProgram(vertex_shader, fragment_shader);
+    //g_LShaderObj = LShader(SHADER_CREATE_TYPE::CODE, vertexShaderCode, fragmentShaderCode);
+	g_LShaderObj = LShader(SHADER_CREATE_TYPE::FILE_NAME, "vertex_shader.vs", "fragment_shader.frag");
 
 	//线框模式
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+	//查看支持的最大顶点属性数量
+	GLint nrAttributes;
+	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
+	std::cout << "Maximum number of vertex attributes supported: " << nrAttributes << std::endl;
 }
 
 
@@ -163,11 +116,15 @@ static void Render() {
     // clear everything
 	glClear(GL_COLOR_BUFFER_BIT);
     
-	glUseProgram(shaderProgram);
+	g_LShaderObj.useProgram();
+	//得到uniform变量的位置
+	GLint uf_location = glGetUniformLocation(g_LShaderObj.getShaderProgram(), "uf_color");
+	//设置shader中uniform变量的值
+	glUniform4f(uf_location, 0.f, 0.5f, 0.1f, 1.0f);
 	//绑定VAO的同时也会自动绑定EBO
 	glBindVertexArray(VAO);
-	//glDrawArrays(GL_TRIANGLES, 0, 3);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 
     // swap the display buffers (displays what was just drawn)

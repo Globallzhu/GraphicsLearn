@@ -3,6 +3,8 @@
 *.vcxproj.user
 *.sdf
 *.opensdf
+*.db
+*.opendb
 **/Debug/
 
 # Xcode crap
