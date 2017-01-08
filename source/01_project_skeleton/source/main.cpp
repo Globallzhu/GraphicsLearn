@@ -2,6 +2,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 // standard C++ libraries
 #include <cassert>
@@ -44,7 +46,7 @@ void loadTriangle() {
 		-0.5, -0.5, 0,		1.0, 0.0, 0.0,		0.0, 0.0,		//左下角
 		-0.5, 0.5, 0,		0.0, 1.0, 0.0,		0.0, 1.0,		//左上角
 		0.5, 0.5, 0,		0.0, 0.0, 1.0,		1.0, 1.0,		//右上角
-		0.5, -0.5, 0,		0.0, 0.0, 0.0,		1.0, 0			//右下角
+		0.5, -0.5, 0,		0.0, 0.0, 0.0,		1.0, 0.0		//右下角
 	};
 
 	GLuint indexs[] = {
@@ -103,6 +105,15 @@ void render() {
 	glClear(GL_COLOR_BUFFER_BIT);
     
 	g_LShaderObj.useProgram();
+
+	// 变换矩阵从右往左读
+	glm::mat4 mat_trans;
+	mat_trans = glm::translate(mat_trans, glm::vec3(0.5, 0.5, 0));
+	mat_trans = glm::rotate(mat_trans, (GLfloat)glfwGetTime() * glm::radians(30.0f), glm::vec3(0, 0, 1.0));
+
+	GLint uf_loc_trans = glGetUniformLocation(g_LShaderObj.getShaderProgram(), "uf_trans");
+	glUniformMatrix4fv(uf_loc_trans, 1, GL_FALSE, glm::value_ptr(mat_trans));
+
 	//得到uniform变量的位置
 	//GLint uf_location = glGetUniformLocation(g_LShaderObj.getShaderProgram(), "uf_color");
 	////设置shader中uniform变量的值
