@@ -26,8 +26,8 @@ public:
 	// 根据shader文件名得到shader
 	GLuint getShaderWithFileName(const GLenum in_shaderType, const char* in_fileName);
 
-	GLuint getShaderProgram();
-	void useProgram();
+	inline GLuint getShaderProgram() { return this->m_shaderProgram; };
+	inline void useProgram() { glUseProgram(m_shaderProgram); };
 private:
 	GLuint m_vertexShader;          //顶点着色器
 	GLuint m_fragmentShader;		//片段着色器

@@ -42,6 +42,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(SolutionDir)source\common\thirdparty\SOIL;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -57,7 +58,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -79,13 +80,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\01_project_skeleton\source\main.cpp" />
-    <ClCompile Include="..\..\source\01_project_skeleton\source\Program.cpp" />
+    <ClCompile Include="..\..\source\01_project_skeleton\source\LTexture.cpp" />
     <ClCompile Include="..\..\source\01_project_skeleton\source\LShader.cpp" />
     <ClCompile Include="..\..\source\common\thirdparty\glew\src\glew.c" />
     <ClCompile Include="platform_windows.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\01_project_skeleton\source\Program.h" />
+    <ClInclude Include="..\..\source\01_project_skeleton\source\LTexture.h" />
     <ClInclude Include="..\..\source\01_project_skeleton\source\LShader.h" />
   </ItemGroup>
   <ItemGroup>

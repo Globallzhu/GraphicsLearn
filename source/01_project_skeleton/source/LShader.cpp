@@ -1,4 +1,5 @@
 #include "LShader.h"
+#include "platform.hpp"
 #include <windows.h>
 
 //////////////////////////////////
@@ -54,17 +55,6 @@ GLuint LShader::getShaderWithFileName(const GLenum in_shaderType, const char* in
 	return out_shader;
 }
 
-GLuint LShader::getShaderProgram()
-{
-	return this->m_shaderProgram;
-}
-
-void LShader::useProgram()
-{
-	glUseProgram(m_shaderProgram);
-}
-
-
 //////////////////////////////////
 // Private Functions
 //////////////////////////////////
@@ -92,15 +82,11 @@ void LShader::createShaderProgram(const char* in_vert_code, const char* in_frag_
 
 string LShader::getCodeWithFileName(const char* in_fileName)
 {
-	//获得shader文件全路径
+	//获得shader文件全路径(windows平台)
 	string str_fullPath = "";
 	string out_shaderCode = "";
-	char fullPath[1024];
-	DWORD len_fullPath = GetModuleFileName(nullptr, fullPath, 1024);
-	if (len_fullPath > 0 && len_fullPath < 1024 ) {
-		str_fullPath = string(fullPath) + "\\..\\" + in_fileName;
-	}
-	else {
+	str_fullPath = ResourcePath(in_fileName);
+	if (str_fullPath.compare("") == 0) {
 		std::cout << "获取文件全路径失败:" << in_fileName << std::endl;
 		return out_shaderCode;
 	}

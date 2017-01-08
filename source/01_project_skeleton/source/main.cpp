@@ -1,5 +1,3 @@
-#include "platform.hpp"
-
 // third-party libraries
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -12,9 +10,10 @@
 #include <cmath>
 
 #include "LShader.h"
+#include "LTexture.h"
 
 // constants
-const glm::vec2 SCREEN_SIZE(800, 600);
+const glm::vec2 SCREEN_SIZE(960, 640);
 
 // globals
 GLFWwindow* gWindow = NULL;
@@ -22,48 +21,31 @@ GLuint VAO = 0;
 GLuint VBO = 0;
 GLuint EBO = 0;
 LShader g_LShaderObj;
-
-const GLchar* vertexShaderCode = "#version 330 core\n"
-	"layout(location = 0) in vec3 vertPos;\n"
-	"layout(location = 1) in vec3 vertColor;\n"
-	"out vec4 finalColor;\n"
-	"void main() {\n"
-	"gl_Position = vec4(vertPos, 1.0);\n"
-	"finalColor = vec4(vertColor, 1.0);\n"
-	"}\n";
-
-const GLchar* fragmentShaderCode = "#version 330\n"
-	"in vec4 finalColor;\n"
-	"uniform vec4 uf_color;\n"
-	"out vec4 vertColor;\n"
-	"void main() {\n"
-	"vertColor = finalColor;\n"
-	"}\n";
+LTexture g_LTexture_0;
+LTexture g_LTexture_1;
 
 // loads the vertex shader and fragment shader, and links them to make the global gProgram
-void LoadShaders() {
-    //std::vector<tdogl::Shader> shaders;
-    //shaders.push_back(tdogl::Shader::shaderFromFile(ResourcePath("vertex-shader.txt"), GL_VERTEX_SHADER));
-    //shaders.push_back(tdogl::Shader::shaderFromFile(ResourcePath("fragment-shader.txt"), GL_FRAGMENT_SHADER));
-    //gProgram = new tdogl::Program(shaders);
+void loadShaders() {
+	//g_LShaderObj = LShader(SHADER_CREATE_TYPE::CODE, vertexShaderCode, fragmentShaderCode);
+	g_LShaderObj = LShader(SHADER_CREATE_TYPE::FILE_NAME, "vertex_shader.vs", "fragment_shader.frag");
 }
 
 // loads a triangle into the VAO global
-void LoadTriangle() {
+void loadTriangle() {
 	// 标准化设备坐标（范围：-1.0~1.0）
-	GLfloat triangle_vertexs[] = {
-		//位置              颜色
-		-0.5, -0.5, 0,		1.0, 0.0, 0.0, 
-		0.5, -0.5, 0,		0.0, 1.0, 0.0,
-		0, 0.5, 0,			0.0, 0.0, 1.0
-	};
-
 	//GLfloat triangle_vertexs[] = {
-	//	-0.5, -0.5, 0,		//左下角
-	//	-0.5, 0.5, 0,		//左上角
-	//	0.5, 0.5, 0,		//右上角
-	//	0.5, -0.5, 0		//右下角
+	//	//位置              颜色				纹理坐标（0~1）
+	//	-0.5, -0.5, 0,		1.0, 0.0, 0.0,		0.0, 0,			//左下
+	//	0.5, -0.5, 0,		0.0, 1.0, 0.0,		1.0, 0,			//右下
+	//	0, 0.5, 0,			0.0, 0.0, 1.0,		0.5, 1.0		//顶部
 	//};
+
+	GLfloat triangle_vertexs[] = {
+		-0.5, -0.5, 0,		1.0, 0.0, 0.0,		0.0, 0.0,		//左下角
+		-0.5, 0.5, 0,		0.0, 1.0, 0.0,		0.0, 1.0,		//左上角
+		0.5, 0.5, 0,		0.0, 0.0, 1.0,		1.0, 1.0,		//右上角
+		0.5, -0.5, 0,		0.0, 0.0, 0.0,		1.0, 0			//右下角
+	};
 
 	GLuint indexs[] = {
 		0,1,2,
@@ -89,17 +71,17 @@ void LoadTriangle() {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexs), indexs, GL_STATIC_DRAW);
 
 	//4.设置顶点属性指针（位置）
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
 	//设置顶点属性指针（颜色）
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(1);
+	//设置顶点属性指针（纹理）
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(2);
 
 	//5.解绑VA0
 	glBindVertexArray(0);
-
-    //g_LShaderObj = LShader(SHADER_CREATE_TYPE::CODE, vertexShaderCode, fragmentShaderCode);
-	g_LShaderObj = LShader(SHADER_CREATE_TYPE::FILE_NAME, "vertex_shader.vs", "fragment_shader.frag");
 
 	//线框模式
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -110,21 +92,37 @@ void LoadTriangle() {
 	std::cout << "Maximum number of vertex attributes supported: " << nrAttributes << std::endl;
 }
 
+void loadTexture() {
+	g_LTexture_0 = LTexture("wall.jpg");
+	g_LTexture_1 = LTexture("face.png");
+}
 
 // draws a single frame
-static void Render() {
+void render() {
     // clear everything
 	glClear(GL_COLOR_BUFFER_BIT);
     
 	g_LShaderObj.useProgram();
 	//得到uniform变量的位置
-	GLint uf_location = glGetUniformLocation(g_LShaderObj.getShaderProgram(), "uf_color");
-	//设置shader中uniform变量的值
-	glUniform4f(uf_location, 0.f, 0.5f, 0.1f, 1.0f);
+	//GLint uf_location = glGetUniformLocation(g_LShaderObj.getShaderProgram(), "uf_color");
+	////设置shader中uniform变量的值
+	//glUniform4f(uf_location, 0.f, 0.5f, 0.1f, 1.0f);
+
+	//在绑定纹理之前先激活纹理单元
+	glActiveTexture(GL_TEXTURE0);
+	//绑定2D纹理
+	glBindTexture(GL_TEXTURE_2D, g_LTexture_0.getTexObj());
+	glUniform1i(glGetUniformLocation(g_LShaderObj.getShaderProgram(),"uf_texture_0" ), 0);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, g_LTexture_1.getTexObj());
+	glUniform1i(glGetUniformLocation(g_LShaderObj.getShaderProgram(), "uf_texture_1"), 1);
+
 	//绑定VAO的同时也会自动绑定EBO
 	glBindVertexArray(VAO);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
-	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	//glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindVertexArray(0);
 
     // swap the display buffers (displays what was just drawn)
@@ -192,10 +190,12 @@ void AppMain() {
 	glClearColor(0, 0, 0, 1); 
 
     // load vertex and fragment shaders into opengl
-    LoadShaders();
+    loadShaders();
 
     // create buffer and fill it with the points of the triangle
-    LoadTriangle();
+    loadTriangle();
+
+	loadTexture();
 
     // run while the window is open
     while(!glfwWindowShouldClose(gWindow)){
@@ -203,7 +203,7 @@ void AppMain() {
         glfwPollEvents();
 
         // draw one frame
-        Render();
+        render();
     }
 
     // 释放glfw申请的内存
