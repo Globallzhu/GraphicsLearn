@@ -59,7 +59,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>legacy_stdio_definitions.lib;SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <IgnoreSpecificDefaultLibraries>libcmtd.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>msvcrtd.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -83,18 +83,22 @@
     <ClCompile Include="..\..\source\01_project_skeleton\source\main.cpp" />
     <ClCompile Include="..\..\source\01_project_skeleton\source\LTexture.cpp" />
     <ClCompile Include="..\..\source\01_project_skeleton\source\LShader.cpp" />
-    <ClCompile Include="..\..\source\01_project_skeleton\source\RenderTriangle.cpp" />
+    <ClCompile Include="..\..\source\01_project_skeleton\source\RenderCube.cpp" />
     <ClCompile Include="..\..\source\common\thirdparty\glew\src\glew.c" />
     <ClCompile Include="platform_windows.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\01_project_skeleton\source\LTexture.h" />
     <ClInclude Include="..\..\source\01_project_skeleton\source\LShader.h" />
-    <ClInclude Include="..\..\source\01_project_skeleton\source\RenderTriangle.h" />
+    <ClInclude Include="..\..\source\01_project_skeleton\source\RenderCube.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\source\01_project_skeleton\resources\fragment_shader.frag" />
     <Text Include="..\..\source\01_project_skeleton\resources\vertex_shader.vs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\source\01_project_skeleton\resources\renderCube.frag" />
+    <None Include="..\..\source\01_project_skeleton\resources\renderCube.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

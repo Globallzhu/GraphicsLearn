@@ -27,7 +27,7 @@
     <ClCompile Include="..\..\source\01_project_skeleton\source\LTexture.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\01_project_skeleton\source\RenderTriangle.cpp">
+    <ClCompile Include="..\..\source\01_project_skeleton\source\RenderCube.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -38,7 +38,7 @@
     <ClInclude Include="..\..\source\01_project_skeleton\source\LTexture.h">
       <Filter>source</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\01_project_skeleton\source\RenderTriangle.h">
+    <ClInclude Include="..\..\source\01_project_skeleton\source\RenderCube.h">
       <Filter>source</Filter>
     </ClInclude>
   </ItemGroup>
@@ -49,5 +49,13 @@
     <Text Include="..\..\source\01_project_skeleton\resources\fragment_shader.frag">
       <Filter>resources</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\source\01_project_skeleton\resources\renderCube.frag">
+      <Filter>resources</Filter>
+    </None>
+    <None Include="..\..\source\01_project_skeleton\resources\renderCube.vs">
+      <Filter>resources</Filter>
+    </None>
   </ItemGroup>
 </Project>

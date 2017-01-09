@@ -1,7 +1,8 @@
-#ifndef _RENDER_TRIANGLE_H_
-#define _RENDER_TRIANGLE_H_
+#ifndef _RENDER_CUBE_H_
+#define _RENDER_CUBE_H_
 
 #include <GL/glew.h>
+#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -13,10 +14,13 @@
 #include "LShader.h"
 #include "LTexture.h"
 
+const float WindowWidth = 960.f;
+const float WindwoHeight = 640.f;
+
 void loadShaders();
 void loadModels();
 void loadTexture();
 void render();
 
 
-#endif // !_RENDER_TRIANGLE_CPP_
+#endif // !_RENDER_CUBE_H_

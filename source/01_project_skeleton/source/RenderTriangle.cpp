@@ -13,7 +13,7 @@ void loadShaders() {
 	g_LShaderObj = LShader(SHADER_CREATE_TYPE::FILE_NAME, "vertex_shader.vs", "fragment_shader.frag");
 }
 
-void loadTriangle() {
+void loadModels() {
 	// 标准化设备坐标（范围：-1.0~1.0）
 	//GLfloat triangle_vertexs[] = {
 	//	//位置              颜色				纹理坐标（0~1）

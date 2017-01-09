@@ -2,20 +2,17 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 // standard C++ libraries
 #include <cassert>
 #include <iostream>
 #include <stdexcept>
 
-#include "LShader.h"
-#include "LTexture.h"
-#include "RenderTriangle.h"
+//#include "RenderTriangle.h"
+#include "RenderCube.h"
 
-// constants
-const glm::vec2 SCREEN_SIZE(960, 640);
+extern const float WindowWidth;
+extern const float WindwoHeight;
 
 // globals
 GLFWwindow* gWindow = NULL;
@@ -51,7 +48,7 @@ void AppMain() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); //使用OpenGL3.3版本
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_RESIZABLE,GL_FALSE);  //不允许用户调整窗口大小
-    gWindow = glfwCreateWindow((int)SCREEN_SIZE.x, (int)SCREEN_SIZE.y, "OpenGL_Learning", nullptr, nullptr);
+    gWindow = glfwCreateWindow((int)WindowWidth, (int)WindwoHeight, "OpenGL_Learning", nullptr, nullptr);
 	if (!gWindow) {
 		throw std::runtime_error("glfwCreateWindow failed. Can your hardware handle OpenGL 3.3?");
 	}
@@ -90,7 +87,7 @@ void AppMain() {
     loadShaders();
 
     // create buffer and fill it with the points of the triangle
-    loadTriangle();
+    loadModels();
 
 	loadTexture();
 
