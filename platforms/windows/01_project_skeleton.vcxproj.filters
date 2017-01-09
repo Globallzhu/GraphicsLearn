@@ -27,12 +27,18 @@
     <ClCompile Include="..\..\source\01_project_skeleton\source\LTexture.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\01_project_skeleton\source\RenderTriangle.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\01_project_skeleton\source\LShader.h">
       <Filter>source</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\01_project_skeleton\source\LTexture.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\01_project_skeleton\source\RenderTriangle.h">
       <Filter>source</Filter>
     </ClInclude>
   </ItemGroup>
