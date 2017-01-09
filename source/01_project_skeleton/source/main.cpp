@@ -13,6 +13,20 @@
 
 extern const float WindowWidth;
 extern const float WindwoHeight;
+extern glm::vec3 cameraPos;
+extern glm::vec3 camera_up_dir;
+extern glm::vec3 camera_face_dir;
+
+const GLfloat camera_speed = 1.2f;
+const GLfloat mouse_sensitivity = 0.075f;
+bool keys_status[1024];
+GLfloat deltaTime = 0.f;
+GLfloat lastTime = 0.f;
+bool bInitWindow = true;
+double last_cursor_pos_x = 0;
+double last_cursor_pos_y = 0;
+GLfloat pitch = 0.f;		//俯仰角（绕x轴旋转）
+GLfloat yaw = 0.f;			//航偏角（绕y轴旋转）
 
 // globals
 GLFWwindow* gWindow = NULL;
@@ -29,9 +43,70 @@ void OnError(int errorCode, const char* msg) {
 
 // 键盘按键回调
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {
+
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(gWindow, GL_TRUE);
+	} 
+
+	if (action == GLFW_PRESS) {
+		keys_status[key] = true;
 	}
+	else if (action == GLFW_RELEASE) {
+		keys_status[key] = false;
+	}
+
+}
+
+void cameraMovement() {
+	deltaTime = glfwGetTime() - lastTime;
+	lastTime = glfwGetTime();
+
+	glm::vec3 cameraRightDir = glm::normalize(glm::cross(camera_face_dir, camera_up_dir));
+	if (keys_status[GLFW_KEY_W]) {
+		cameraPos += deltaTime * camera_speed * camera_face_dir;
+	}
+	if(keys_status[GLFW_KEY_S]) {
+		cameraPos -= deltaTime * camera_speed * camera_face_dir;
+	}
+	if (keys_status[GLFW_KEY_A]) {
+		cameraPos -= deltaTime * camera_speed * cameraRightDir;
+	}
+	if (keys_status[GLFW_KEY_D]) {
+		cameraPos += deltaTime * camera_speed * cameraRightDir;
+	}
+}
+
+//鼠标输入回调
+void mouse_callback(GLFWwindow* window, double pos_x, double pos_y) {
+	if (bInitWindow) {
+		last_cursor_pos_x = pos_x;
+		last_cursor_pos_y = pos_y;
+		bInitWindow = false;
+	}
+	double offset_x = pos_x - last_cursor_pos_x;
+	double offset_y = pos_y - last_cursor_pos_y;
+	last_cursor_pos_x = pos_x;
+	last_cursor_pos_y = pos_y;
+
+	// 调整灵敏度
+	offset_x *= mouse_sensitivity;
+	offset_y *= mouse_sensitivity;
+
+	yaw += offset_x;
+	pitch -= offset_y;
+
+	if (pitch > 89.0f) {
+		pitch = 89.0f;
+	}
+	if (pitch < -89.0f) {
+		pitch = -89.0f;
+	}
+
+	glm::vec3 front;
+	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	front.y = sin(glm::radians(pitch));
+	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	camera_face_dir = glm::normalize(front);
 }
 
 // the program starts here
@@ -58,7 +133,11 @@ void AppMain() {
 
 	//设置窗口按键回调
 	glfwSetKeyCallback(gWindow, key_callback);
-    
+
+	//隐藏鼠标
+	glfwSetInputMode(gWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPosCallback(gWindow, mouse_callback);
+   
     // initialise GLEW
     glewExperimental = GL_TRUE; //stops glew crashing on OSX :-/
 	if (glewInit() != GLEW_OK) {
@@ -95,6 +174,8 @@ void AppMain() {
     while(!glfwWindowShouldClose(gWindow)){
         // process pending events
         glfwPollEvents();
+
+		cameraMovement();
 
         // draw one frame
         render();
