@@ -10,6 +10,9 @@
     <Filter Include="resources">
       <UniqueIdentifier>{1134d475-c4f8-45ca-9697-d447037cbb8a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\ModelReader">
+      <UniqueIdentifier>{501a7c16-eb34-4a0e-800c-98f03450bbe4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="platform_windows.cpp">
@@ -33,6 +36,12 @@
     <ClCompile Include="..\..\source\01_project_skeleton\source\LCamera.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="LModel.cpp">
+      <Filter>source\ModelReader</Filter>
+    </ClCompile>
+    <ClCompile Include="LMesh.cpp">
+      <Filter>source\ModelReader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\01_project_skeleton\source\LShader.h">
@@ -46,6 +55,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\01_project_skeleton\source\LCamera.h">
       <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="LModel.h">
+      <Filter>source\ModelReader</Filter>
+    </ClInclude>
+    <ClInclude Include="LMesh.h">
+      <Filter>source\ModelReader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

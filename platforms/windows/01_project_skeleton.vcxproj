@@ -42,7 +42,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)source\common\thirdparty\SOIL;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)source\common\thirdparty\assimp;$(SolutionDir)source\common\thirdparty\SOIL;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -58,7 +58,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>legacy_stdio_definitions.lib;SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;SOIL.lib;assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>msvcrtd.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
@@ -86,6 +86,8 @@
     <ClCompile Include="..\..\source\01_project_skeleton\source\LShader.cpp" />
     <ClCompile Include="..\..\source\01_project_skeleton\source\RenderCube.cpp" />
     <ClCompile Include="..\..\source\common\thirdparty\glew\src\glew.c" />
+    <ClCompile Include="LMesh.cpp" />
+    <ClCompile Include="LModel.cpp" />
     <ClCompile Include="platform_windows.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -93,6 +95,8 @@
     <ClInclude Include="..\..\source\01_project_skeleton\source\LTexture.h" />
     <ClInclude Include="..\..\source\01_project_skeleton\source\LShader.h" />
     <ClInclude Include="..\..\source\01_project_skeleton\source\RenderCube.h" />
+    <ClInclude Include="LMesh.h" />
+    <ClInclude Include="LModel.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\source\01_project_skeleton\resources\fragment_shader.frag" />
