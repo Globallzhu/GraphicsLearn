@@ -42,11 +42,13 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		glfwSetWindowShouldClose(gWindow, GL_TRUE);
 	} 
 
-	if (action == GLFW_PRESS) {
-		keys_status[key] = true;
-	}
-	else if (action == GLFW_RELEASE) {
-		keys_status[key] = false;
+	if (key >= 0 && key < 1024) {
+		if (action == GLFW_PRESS) {
+			keys_status[key] = true;
+		}
+		else if (action == GLFW_RELEASE) {
+			keys_status[key] = false;
+		}
 	}
 
 }
