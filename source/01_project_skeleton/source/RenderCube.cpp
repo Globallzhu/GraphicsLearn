@@ -1,4 +1,5 @@
 #include "RenderCube.h"
+#include "LCamera.h"
 
 //定义全局变量
 GLuint VAO = 0;
@@ -12,6 +13,8 @@ const glm::vec3 cameraTargetPos = glm::vec3(0 ,0, 0);
 glm::vec3 cameraPos = glm::vec3(0.f, 0.f, 3.f);
 glm::vec3 camera_up_dir = glm::vec3(0.f, 1.f, 0.f);
 glm::vec3 camera_face_dir = glm::vec3(0.f, 0.f, -1.f);
+
+LCamera cameraObj = LCamera(cameraPos);
 
 void loadShaders() {
 	g_LShaderObj = LShader(SHADER_CREATE_TYPE::FILE_NAME, "renderCube.vs", "renderCube.frag");
@@ -128,7 +131,7 @@ void loadTexture() {
 }
 
 void render() {
-	// clear everything
+	// 清除颜色和深度缓存
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	g_LShaderObj.useProgram();
@@ -139,19 +142,10 @@ void render() {
 	GLint uf_loc_model = glGetUniformLocation(g_LShaderObj.getShaderProgram(), "uf_modelMat");
 	glUniformMatrix4fv(uf_loc_model, 1, GL_FALSE, glm::value_ptr(modelMat));
 
-	/*
-	// 摄像机z轴方向向量
-	glm::vec3 camera_z_dir = glm::normalize(cameraPos - cameraTargetPos);
-	glm::vec3 up_vec = glm::vec3(0.f, 1.f, 0.f);
-	// 摄像机x轴方向向量(右手坐标系)
-	glm::vec3 camera_x_dir = glm::normalize(glm::cross(up_vec, camera_z_dir));
-	// 摄像机y轴方向向量
-	glm::vec3 camera_y_dir = glm::normalize(glm::cross(camera_z_dir, camera_x_dir));
-	*/
-
 	glm::mat4 viewMat;
 	//viewMat = glm::translate(viewMat, glm::vec3(0.0, 0.0, -3.0));
-	viewMat = glm::lookAt(cameraPos, cameraPos + camera_face_dir, camera_up_dir);
+	//viewMat = glm::lookAt(cameraPos, cameraPos + camera_face_dir, camera_up_dir);
+	viewMat = cameraObj.getProjectionMat();
 	GLint uf_loc_view = glGetUniformLocation(g_LShaderObj.getShaderProgram(), "uf_viewMat");
 	glUniformMatrix4fv(uf_loc_view, 1, GL_FALSE, glm::value_ptr(viewMat));
 

@@ -80,6 +80,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\source\01_project_skeleton\source\LCamera.cpp" />
     <ClCompile Include="..\..\source\01_project_skeleton\source\main.cpp" />
     <ClCompile Include="..\..\source\01_project_skeleton\source\LTexture.cpp" />
     <ClCompile Include="..\..\source\01_project_skeleton\source\LShader.cpp" />
@@ -88,6 +89,7 @@
     <ClCompile Include="platform_windows.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\source\01_project_skeleton\source\LCamera.h" />
     <ClInclude Include="..\..\source\01_project_skeleton\source\LTexture.h" />
     <ClInclude Include="..\..\source\01_project_skeleton\source\LShader.h" />
     <ClInclude Include="..\..\source\01_project_skeleton\source\RenderCube.h" />

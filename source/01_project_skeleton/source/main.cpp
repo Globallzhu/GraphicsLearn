@@ -10,12 +10,14 @@
 
 //#include "RenderTriangle.h"
 #include "RenderCube.h"
+#include "LCamera.h"
 
 extern const float WindowWidth;
 extern const float WindwoHeight;
 extern glm::vec3 cameraPos;
 extern glm::vec3 camera_up_dir;
 extern glm::vec3 camera_face_dir;
+extern LCamera cameraObj;
 
 const GLfloat camera_speed = 1.2f;
 const GLfloat mouse_sensitivity = 0.075f;
@@ -25,17 +27,9 @@ GLfloat lastTime = 0.f;
 bool bInitWindow = true;
 double last_cursor_pos_x = 0;
 double last_cursor_pos_y = 0;
-GLfloat pitch = 0.f;		//¸©Ñö½Ç£¨ÈÆxÖáÐý×ª£©
-GLfloat yaw = 0.f;			//º½Æ«½Ç£¨ÈÆyÖáÐý×ª£©
 
 // globals
 GLFWwindow* gWindow = NULL;
-//extern GLuint VAO;
-//extern GLuint VBO;
-//extern GLuint EBO;
-//extern LShader g_LShaderObj;
-//extern LTexture g_LTexture_0;
-//extern LTexture g_LTexture_1;
 
 void OnError(int errorCode, const char* msg) {
     throw std::runtime_error(msg);
@@ -61,18 +55,17 @@ void cameraMovement() {
 	deltaTime = glfwGetTime() - lastTime;
 	lastTime = glfwGetTime();
 
-	glm::vec3 cameraRightDir = glm::normalize(glm::cross(camera_face_dir, camera_up_dir));
 	if (keys_status[GLFW_KEY_W]) {
-		cameraPos += deltaTime * camera_speed * camera_face_dir;
+		cameraObj.move(CAMERA_MOVE_DIR::FRONT, deltaTime);
 	}
 	if(keys_status[GLFW_KEY_S]) {
-		cameraPos -= deltaTime * camera_speed * camera_face_dir;
+		cameraObj.move(CAMERA_MOVE_DIR::BACK, deltaTime);
 	}
 	if (keys_status[GLFW_KEY_A]) {
-		cameraPos -= deltaTime * camera_speed * cameraRightDir;
+		cameraObj.move(CAMERA_MOVE_DIR::LEFT, deltaTime);
 	}
 	if (keys_status[GLFW_KEY_D]) {
-		cameraPos += deltaTime * camera_speed * cameraRightDir;
+		cameraObj.move(CAMERA_MOVE_DIR::RIGHT, deltaTime);
 	}
 }
 
@@ -88,25 +81,7 @@ void mouse_callback(GLFWwindow* window, double pos_x, double pos_y) {
 	last_cursor_pos_x = pos_x;
 	last_cursor_pos_y = pos_y;
 
-	// µ÷ÕûÁéÃô¶È
-	offset_x *= mouse_sensitivity;
-	offset_y *= mouse_sensitivity;
-
-	yaw += offset_x;
-	pitch -= offset_y;
-
-	if (pitch > 89.0f) {
-		pitch = 89.0f;
-	}
-	if (pitch < -89.0f) {
-		pitch = -89.0f;
-	}
-
-	glm::vec3 front;
-	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-	front.y = sin(glm::radians(pitch));
-	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-	camera_face_dir = glm::normalize(front);
+	cameraObj.rotateByMouse(offset_x, offset_y);
 }
 
 // the program starts here
