@@ -32,6 +32,7 @@ class LMTexture
 public:
 	GLuint m_id;
 	LMTextureType m_type;			//漫反射贴图还是镜面贴图或者其他类型
+	string m_fileName;
 };
 
 // 模型网格数据结构

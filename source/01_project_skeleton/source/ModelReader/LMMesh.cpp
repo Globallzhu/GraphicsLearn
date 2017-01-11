@@ -22,16 +22,16 @@ void LMMesh::draw(LShader &in_shaderPro)
 	int diffuseIdx = 1;
 	int specularIdx = 1;
 	in_shaderPro.useProgram();
-	for (GLint i = 0; i < this->m_textures.size(); i++) {
+	for (GLuint  i = 0; i < this->m_textures.size(); i++) {
 		char uf_name[64];
 		if (this->m_textures[i].m_type == LMTextureType::Diffuse) {
 			diffuseIdx++;
-			sprintf(uf_name, "uf_tex_diff_%d", diffuseIdx);
+			sprintf_s(uf_name, "uf_tex_diff_%d", diffuseIdx);
 		}
 		else if (this->m_textures[i].m_type == LMTextureType::Specular)
 		{
 			specularIdx++;
-			sprintf(uf_name, "uf_tex_spec_%d", specularIdx);
+			sprintf_s(uf_name, "uf_tex_spec_%d", specularIdx);
 		}
 
 		glActiveTexture(GL_TEXTURE0 + i);
@@ -46,7 +46,7 @@ void LMMesh::draw(LShader &in_shaderPro)
 	glBindVertexArray(0);
 
 	//解绑所有的纹理单元
-	for (GLint i = 0; i < this->m_textures.size(); i++) {
+	for (GLuint  i = 0; i < this->m_textures.size(); i++) {
 		glActiveTexture(GL_TEXTURE0 + i);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}

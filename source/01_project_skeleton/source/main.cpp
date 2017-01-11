@@ -11,6 +11,7 @@
 //#include "RenderTriangle.h"
 #include "RenderCube.h"
 #include "LCamera.h"
+#include "ModelReader/LMModel.h"
 
 extern const float WindowWidth;
 extern const float WindwoHeight;
@@ -140,12 +141,15 @@ void AppMain() {
 	glClearColor(0, 0, 0, 1); 
 
     // load vertex and fragment shaders into opengl
-    loadShaders();
+    //loadShaders();
 
     // create buffer and fill it with the points of the triangle
-    loadModels();
+    //loadModels();
 
-	loadTexture();
+	//loadTexture();
+
+	LShader l_shaderPro = LShader(SHADER_CREATE_TYPE::FILE_NAME, "renderCube.vs", "renderCube.frag");
+	LMModel l_modelObj = LMModel("nanosuit.obj");
 
     // run while the window is open
     while(!glfwWindowShouldClose(gWindow)){
@@ -155,7 +159,24 @@ void AppMain() {
 		cameraMovement();
 
         // draw one frame
-        render();
+        //render();
+
+		glm::mat4 modelMat;
+		modelMat = glm::rotate(modelMat, glm::radians(0.f), glm::vec3(0.2, 0.7, 0.4));
+		GLint uf_loc_model = glGetUniformLocation(l_shaderPro.getShaderProgram(), "uf_modelMat");
+		glUniformMatrix4fv(uf_loc_model, 1, GL_FALSE, glm::value_ptr(modelMat));
+
+		glm::mat4 viewMat;
+		viewMat = cameraObj.getProjectionMat();
+		GLint uf_loc_view = glGetUniformLocation(l_shaderPro.getShaderProgram(), "uf_viewMat");
+		glUniformMatrix4fv(uf_loc_view, 1, GL_FALSE, glm::value_ptr(viewMat));
+
+		glm::mat4 projectionMat;
+		projectionMat = glm::perspective(45.0f, (WindowWidth / WindwoHeight), 0.1f, 100.f);
+		GLint uf_loc_proj = glGetUniformLocation(l_shaderPro.getShaderProgram(), "uf_projectionMat");
+		glUniformMatrix4fv(uf_loc_proj, 1, GL_FALSE, glm::value_ptr(projectionMat));
+
+		l_modelObj.draw(l_shaderPro);
 
 		// swap the display buffers (displays what was just drawn)
 		glfwSwapBuffers(gWindow);
