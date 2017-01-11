@@ -1,5 +1,5 @@
-#ifndef _LMODEL_H_
-#define _LMODEL_H_
+#ifndef _LMMODEL_H_
+#define _LMMODEL_H_
 
 #include <assimp/Importer.hpp>
 

@@ -84,19 +84,19 @@
     <ClCompile Include="..\..\source\01_project_skeleton\source\main.cpp" />
     <ClCompile Include="..\..\source\01_project_skeleton\source\LTexture.cpp" />
     <ClCompile Include="..\..\source\01_project_skeleton\source\LShader.cpp" />
+    <ClCompile Include="..\..\source\01_project_skeleton\source\ModelReader\LMMesh.cpp" />
+    <ClCompile Include="..\..\source\01_project_skeleton\source\ModelReader\LMModel.cpp" />
     <ClCompile Include="..\..\source\01_project_skeleton\source\RenderCube.cpp" />
     <ClCompile Include="..\..\source\common\thirdparty\glew\src\glew.c" />
-    <ClCompile Include="LMesh.cpp" />
-    <ClCompile Include="LModel.cpp" />
     <ClCompile Include="platform_windows.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\01_project_skeleton\source\LCamera.h" />
     <ClInclude Include="..\..\source\01_project_skeleton\source\LTexture.h" />
     <ClInclude Include="..\..\source\01_project_skeleton\source\LShader.h" />
+    <ClInclude Include="..\..\source\01_project_skeleton\source\ModelReader\LMMesh.h" />
+    <ClInclude Include="..\..\source\01_project_skeleton\source\ModelReader\LMModel.h" />
     <ClInclude Include="..\..\source\01_project_skeleton\source\RenderCube.h" />
-    <ClInclude Include="LMesh.h" />
-    <ClInclude Include="LModel.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\source\01_project_skeleton\resources\fragment_shader.frag" />
