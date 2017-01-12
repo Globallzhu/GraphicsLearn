@@ -117,7 +117,7 @@ vector<LMTexture> LMModel::loadMaterialTexture(const aiMaterial * in_pMat, const
 			}
 		}
 		if (isLoaded == false) {
-			string fullPath = this->m_directory + "/" + str_name.C_Str();
+			string fullPath =  string("model/") + str_name.C_Str();
 			LTexture l_LTexObj = LTexture(fullPath.c_str());
 			LMTexture l_LMTexObj;
 			l_LMTexObj.m_id = l_LTexObj.getTexObj();

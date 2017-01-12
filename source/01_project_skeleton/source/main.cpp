@@ -140,16 +140,13 @@ void AppMain() {
 	// 设置清空颜色为黑色
 	glClearColor(0, 0, 0, 1); 
 
-    // load vertex and fragment shaders into opengl
-    //loadShaders();
-
-    // create buffer and fill it with the points of the triangle
-    //loadModels();
-
+ //   loadShaders();
+ //   loadModels();
 	//loadTexture();
 
-	LShader l_shaderPro = LShader(SHADER_CREATE_TYPE::FILE_NAME, "renderCube.vs", "renderCube.frag");
-	LMModel l_modelObj = LMModel("nanosuit.obj");
+	cameraObj = LCamera(glm::vec3(0.f, 0.f, 10.f));
+	LShader l_shaderPro = LShader(SHADER_CREATE_TYPE::FILE_NAME, "renderModel.vs", "renderModel.frag");
+	LMModel l_modelObj = LMModel("model/nanosuit.obj");
 
     // run while the window is open
     while(!glfwWindowShouldClose(gWindow)){
@@ -158,11 +155,20 @@ void AppMain() {
 
 		cameraMovement();
 
+		// 清除颜色和深度缓存
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         // draw one frame
         //render();
 
+		l_shaderPro.useProgram();
+
 		glm::mat4 modelMat;
-		modelMat = glm::rotate(modelMat, glm::radians(0.f), glm::vec3(0.2, 0.7, 0.4));
+		//modelMat = glm::rotate(modelMat, glm::radians(0.f), glm::vec3(0.2, 0.7, 0.4));
+		modelMat = glm::translate(modelMat, glm::vec3(0.0, -6.f, 0.f));
+		glm::mat4 scaleMat;
+		scaleMat = glm::scale(scaleMat, glm::vec3(0.1f, 0.1f, 0.1f));
+		modelMat = modelMat * modelMat;
 		GLint uf_loc_model = glGetUniformLocation(l_shaderPro.getShaderProgram(), "uf_modelMat");
 		glUniformMatrix4fv(uf_loc_model, 1, GL_FALSE, glm::value_ptr(modelMat));
 
@@ -177,6 +183,7 @@ void AppMain() {
 		glUniformMatrix4fv(uf_loc_proj, 1, GL_FALSE, glm::value_ptr(projectionMat));
 
 		l_modelObj.draw(l_shaderPro);
+		
 
 		// swap the display buffers (displays what was just drawn)
 		glfwSwapBuffers(gWindow);

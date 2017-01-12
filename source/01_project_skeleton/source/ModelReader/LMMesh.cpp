@@ -19,19 +19,18 @@ LMMesh::LMMesh(const vector<LMVertex> in_vertices, const vector<GLuint> in_index
 
 void LMMesh::draw(LShader &in_shaderPro)
 {	
-	int diffuseIdx = 1;
-	int specularIdx = 1;
-	in_shaderPro.useProgram();
+	int diffuseIdx = 0;
+	int specularIdx = 0;
+	//in_shaderPro.useProgram();
 	for (GLuint  i = 0; i < this->m_textures.size(); i++) {
 		char uf_name[64];
 		if (this->m_textures[i].m_type == LMTextureType::Diffuse) {
-			diffuseIdx++;
 			sprintf_s(uf_name, "uf_tex_diff_%d", diffuseIdx);
+			diffuseIdx++;
 		}
-		else if (this->m_textures[i].m_type == LMTextureType::Specular)
-		{
-			specularIdx++;
+		else if (this->m_textures[i].m_type == LMTextureType::Specular) {
 			sprintf_s(uf_name, "uf_tex_spec_%d", specularIdx);
+			specularIdx++;
 		}
 
 		glActiveTexture(GL_TEXTURE0 + i);
@@ -59,11 +58,11 @@ void LMMesh::initMesh()
 
 	glGenBuffers(1, &this->m_VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, this->m_VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(this->m_vertices[0]) * m_vertices.size(), &this->m_vertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(LMVertex) * m_vertices.size(), &this->m_vertices[0], GL_STATIC_DRAW);
 
 	glGenBuffers(1, &this->m_EBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->m_EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(this->m_indexes[0]) * m_indexes.size(), &this->m_indexes[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * m_indexes.size(), &this->m_indexes[0], GL_STATIC_DRAW);
 
 	//设置顶点坐标属性指针
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(LMVertex), (GLvoid*)0);

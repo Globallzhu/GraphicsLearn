@@ -105,6 +105,8 @@
   <ItemGroup>
     <None Include="..\..\source\01_project_skeleton\resources\renderCube.frag" />
     <None Include="..\..\source\01_project_skeleton\resources\renderCube.vs" />
+    <None Include="..\..\source\01_project_skeleton\resources\renderModel.frag" />
+    <None Include="..\..\source\01_project_skeleton\resources\renderModel.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
