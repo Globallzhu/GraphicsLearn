@@ -105,6 +105,7 @@
   <ItemGroup>
     <None Include="..\..\source\01_project_skeleton\resources\renderCube.frag" />
     <None Include="..\..\source\01_project_skeleton\resources\renderCube.vs" />
+    <None Include="..\..\source\01_project_skeleton\resources\renderLight.frag" />
     <None Include="..\..\source\01_project_skeleton\resources\renderModel.frag" />
     <None Include="..\..\source\01_project_skeleton\resources\renderModel.vs" />
   </ItemGroup>

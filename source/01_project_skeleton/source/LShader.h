@@ -32,6 +32,7 @@ private:
 	GLuint m_vertexShader;          //顶点着色器
 	GLuint m_fragmentShader;		//片段着色器
 	GLuint m_shaderProgram;
+	string m_fileName;
 
 	// 根据顶点shader和片段shader获得shader program
 	void createShaderProgram(const char* in_vert_code, const char* in_frag_code);

@@ -14,6 +14,7 @@ LShader::~LShader()
 	m_vertexShader = 0;
 	m_fragmentShader = 0;
 	m_shaderProgram = 0;
+	m_fileName = "";
 }
 
 LShader::LShader(SHADER_CREATE_TYPE in_createType,const char* in_vert_str, const char* in_frag_str) :m_vertexShader(0),
@@ -28,6 +29,7 @@ m_fragmentShader(0), m_shaderProgram(0)
 	else {
 		str_vert_code = this->getCodeWithFileName(in_vert_str);
 		str_frag_code = this->getCodeWithFileName(in_frag_str);
+		m_fileName = in_vert_str;
 	}
 	this->createShaderProgram(str_vert_code.c_str(), str_frag_code.c_str());
 }
@@ -43,7 +45,7 @@ GLuint LShader::getShaderWithCode(const GLenum in_shaderType, const char * in_sh
 	glGetShaderiv(out_shader, GL_COMPILE_STATUS, &success);
 	if (!success) {
 		glGetShaderInfoLog(out_shader, 512, nullptr, infoLog);
-		std::cout << "Compile shader error:" << infoLog << std::endl;
+		std::cout << "Compile shader name:" << this->m_fileName << "\n" << infoLog << std::endl;
 	}
 	return out_shader;
 }

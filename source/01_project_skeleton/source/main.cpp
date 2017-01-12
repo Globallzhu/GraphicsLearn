@@ -15,13 +15,10 @@
 
 extern const float WindowWidth;
 extern const float WindwoHeight;
-extern glm::vec3 cameraPos;
-extern glm::vec3 camera_up_dir;
-extern glm::vec3 camera_face_dir;
-extern LCamera cameraObj;
+extern glm::vec3 g_lightPos;
 
-const GLfloat camera_speed = 1.2f;
-const GLfloat mouse_sensitivity = 0.075f;
+LCamera cameraObj;
+
 bool keys_status[1024];
 GLfloat deltaTime = 0.f;
 GLfloat lastTime = 0.f;
@@ -87,6 +84,34 @@ void mouse_callback(GLFWwindow* window, double pos_x, double pos_y) {
 	cameraObj.rotateByMouse(offset_x, offset_y);
 }
 
+void readerModel(LCamera &in_cameraObj, LShader &in_shaderPro, LMModel &in_modelObj) {
+
+	in_shaderPro.useProgram();
+
+	setLightShaderAttrib(in_cameraObj, in_shaderPro);
+	
+	glm::mat4 modelMat;
+	//modelMat = glm::rotate(modelMat, glm::radians(0.f), glm::vec3(0.2, 0.7, 0.4));
+	modelMat = glm::translate(modelMat, glm::vec3(0.0, 0.0f, 0.f));
+	glm::mat4 scaleMat;
+	scaleMat = glm::scale(scaleMat, glm::vec3(0.3f, 0.3f, 0.3f));
+	modelMat = modelMat * scaleMat;
+	GLint uf_loc_model = glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_modelMat");
+	glUniformMatrix4fv(uf_loc_model, 1, GL_FALSE, glm::value_ptr(modelMat));
+
+	glm::mat4 viewMat;
+	viewMat = in_cameraObj.getProjectionMat();
+	GLint uf_loc_view = glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_viewMat");
+	glUniformMatrix4fv(uf_loc_view, 1, GL_FALSE, glm::value_ptr(viewMat));
+
+	glm::mat4 projectionMat;
+	projectionMat = glm::perspective(45.0f, (WindowWidth / WindwoHeight), 0.1f, 100.f);
+	GLint uf_loc_proj = glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_projectionMat");
+	glUniformMatrix4fv(uf_loc_proj, 1, GL_FALSE, glm::value_ptr(projectionMat));
+
+	in_modelObj.draw(in_shaderPro);
+}
+
 // the program starts here
 void AppMain() {
     // initialise GLFW
@@ -140,13 +165,16 @@ void AppMain() {
 	// 设置清空颜色为黑色
 	glClearColor(0, 0, 0, 1); 
 
- //   loadShaders();
- //   loadModels();
-	//loadTexture();
+	cameraObj = LCamera(glm::vec3(0.f, 3.5f, 3.f));
 
-	cameraObj = LCamera(glm::vec3(0.f, 0.f, 10.f));
+    loadShaders();
+    loadModels();
+	loadTexture();
+
 	LShader l_shaderPro = LShader(SHADER_CREATE_TYPE::FILE_NAME, "renderModel.vs", "renderModel.frag");
-	LMModel l_modelObj = LMModel("model/nanosuit.obj");
+	LMModel l_modelObj = LMModel("model\\nanosuit.obj");
+	// 启用深度测试
+	glEnable(GL_DEPTH_TEST);
 
     // run while the window is open
     while(!glfwWindowShouldClose(gWindow)){
@@ -157,33 +185,11 @@ void AppMain() {
 
 		// 清除颜色和深度缓存
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         // draw one frame
-        //render();
+		renderLightSource(cameraObj);
+		renderCube(cameraObj);
 
-		l_shaderPro.useProgram();
-
-		glm::mat4 modelMat;
-		//modelMat = glm::rotate(modelMat, glm::radians(0.f), glm::vec3(0.2, 0.7, 0.4));
-		modelMat = glm::translate(modelMat, glm::vec3(0.0, -6.f, 0.f));
-		glm::mat4 scaleMat;
-		scaleMat = glm::scale(scaleMat, glm::vec3(0.1f, 0.1f, 0.1f));
-		modelMat = modelMat * modelMat;
-		GLint uf_loc_model = glGetUniformLocation(l_shaderPro.getShaderProgram(), "uf_modelMat");
-		glUniformMatrix4fv(uf_loc_model, 1, GL_FALSE, glm::value_ptr(modelMat));
-
-		glm::mat4 viewMat;
-		viewMat = cameraObj.getProjectionMat();
-		GLint uf_loc_view = glGetUniformLocation(l_shaderPro.getShaderProgram(), "uf_viewMat");
-		glUniformMatrix4fv(uf_loc_view, 1, GL_FALSE, glm::value_ptr(viewMat));
-
-		glm::mat4 projectionMat;
-		projectionMat = glm::perspective(45.0f, (WindowWidth / WindwoHeight), 0.1f, 100.f);
-		GLint uf_loc_proj = glGetUniformLocation(l_shaderPro.getShaderProgram(), "uf_projectionMat");
-		glUniformMatrix4fv(uf_loc_proj, 1, GL_FALSE, glm::value_ptr(projectionMat));
-
-		l_modelObj.draw(l_shaderPro);
-		
+		readerModel(cameraObj, l_shaderPro, l_modelObj);
 
 		// swap the display buffers (displays what was just drawn)
 		glfwSwapBuffers(gWindow);

@@ -27,6 +27,7 @@ public:
 	// 监听键盘按键，移动摄像机
 	void move(const CAMERA_MOVE_DIR in_dir,const GLfloat in_deltaTime);
 
+	inline glm::vec3 getPosition() { return this->m_cameraPos; };
 private:
 	static glm::vec3 CameraUpDir;		//由于不考虑滚转角（绕z轴转动）,向上的方向向量可以固定为(0,1,0)
 	glm::vec3 m_cameraPos;

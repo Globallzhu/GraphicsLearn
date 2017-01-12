@@ -32,7 +32,7 @@ void LMModel::initModel(const char* in_fileName)
 		cout << "导入模型错误::" << importerObj.GetErrorString() << endl;
 		return;
 	}
-	this->m_directory = str_fullPath.substr(0, str_fullPath.find_last_of('/'));
+	this->m_directory = str_fullPath.substr(0, str_fullPath.find_last_of('\\'));
 	this->processNode(pScene->mRootNode, pScene);
 }
 
@@ -117,7 +117,8 @@ vector<LMTexture> LMModel::loadMaterialTexture(const aiMaterial * in_pMat, const
 			}
 		}
 		if (isLoaded == false) {
-			string fullPath =  string("model/") + str_name.C_Str();
+			//string fullPath =  string("model/") + str_name.C_Str();
+			string fullPath = this->m_directory + "\\" + str_name.C_Str();
 			LTexture l_LTexObj = LTexture(fullPath.c_str());
 			LMTexture l_LMTexObj;
 			l_LMTexObj.m_id = l_LTexObj.getTexObj();

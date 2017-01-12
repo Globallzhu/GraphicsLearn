@@ -1,5 +1,4 @@
 #include "LTexture.h"
-#include "platform.hpp"
 #include <SOIL.h>
 
 LTexture::LTexture():m_texObj(0)
@@ -22,7 +21,7 @@ void LTexture::createTexture(const char* in_imgName, const GLint in_s_warp, cons
 {
 	int texWidth, texHeight = 0;
 	// 通过SOIL库读取图片数据
-	unsigned char* textureImg = SOIL_load_image(ResourcePath(in_imgName).c_str(), &texWidth, &texHeight, 0, SOIL_LOAD_RGB);
+	unsigned char* textureImg = SOIL_load_image(in_imgName, &texWidth, &texHeight, 0, SOIL_LOAD_RGB);
 	if (textureImg != nullptr) {
 		//生成gl纹理对象并绑定
 		glGenTextures(1, &this->m_texObj);

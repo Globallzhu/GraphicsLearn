@@ -84,5 +84,8 @@
     <None Include="..\..\source\01_project_skeleton\resources\renderModel.vs">
       <Filter>resources</Filter>
     </None>
+    <None Include="..\..\source\01_project_skeleton\resources\renderLight.frag">
+      <Filter>resources</Filter>
+    </None>
   </ItemGroup>
 </Project>

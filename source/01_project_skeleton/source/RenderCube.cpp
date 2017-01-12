@@ -1,23 +1,21 @@
 #include "RenderCube.h"
 #include "LCamera.h"
+#include "platform.hpp"
 
 //定义全局变量
 GLuint VAO = 0;
 GLuint VBO = 0;
 GLuint EBO = 0;
-LShader g_LShaderObj;
+LShader g_lightShader;
+LShader g_cubeShader;
 LTexture g_LTexture_0;
 LTexture g_LTexture_1;
 
-const glm::vec3 cameraTargetPos = glm::vec3(0 ,0, 0);
-glm::vec3 cameraPos = glm::vec3(0.f, 0.f, 3.f);
-glm::vec3 camera_up_dir = glm::vec3(0.f, 1.f, 0.f);
-glm::vec3 camera_face_dir = glm::vec3(0.f, 0.f, -1.f);
-
-LCamera cameraObj = LCamera(cameraPos);
+glm::vec3 g_lightPos = glm::vec3(3.5f, 4.f, 0.f);
 
 void loadShaders() {
-	g_LShaderObj = LShader(SHADER_CREATE_TYPE::FILE_NAME, "renderCube.vs", "renderCube.frag");
+	g_lightShader = LShader(SHADER_CREATE_TYPE::FILE_NAME, "renderCube.vs", "renderLight.frag");
+	g_cubeShader = LShader(SHADER_CREATE_TYPE::FILE_NAME, "renderCube.vs", "renderModel.frag");
 }
 
 void loadModels() {
@@ -42,47 +40,48 @@ void loadModels() {
 	//};
 
 	GLfloat cube_vers[] = {
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-		0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		//顶点坐标				法向量					纹理坐标
+		-0.5f, -0.5f, -0.5f,	0.0f,  0.0f, -1.0f,		0.0f, 0.0f,
+		0.5f, -0.5f, -0.5f,		0.0f,  0.0f, -1.0f,		1.0f, 0.0f,
+		0.5f,  0.5f, -0.5f,		0.0f,  0.0f, -1.0f,     1.0f, 1.0f,
+		0.5f,  0.5f, -0.5f,		0.0f,  0.0f, -1.0f,     1.0f, 1.0f,
+		-0.5f,  0.5f, -0.5f,	0.0f,  0.0f, -1.0f,     0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,	0.0f,  0.0f, -1.0f,     0.0f, 0.0f,
 
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,	0.0f,  0.0f, 1.0f,	    0.0f, 0.0f,
+		0.5f, -0.5f,  0.5f,		0.0f,  0.0f, 1.0f,      1.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,		0.0f,  0.0f, 1.0f,	    1.0f, 1.0f,
+		0.5f,  0.5f,  0.5f,		0.0f,  0.0f, 1.0f,      1.0f, 1.0f,
+		-0.5f,  0.5f,  0.5f,	0.0f,  0.0f, 1.0f,	    0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,	0.0f,  0.0f, 1.0f,      0.0f, 0.0f,
 
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,	-1.0f,  0.0f,  0.0f,    1.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,	-1.0f,  0.0f,  0.0f,    1.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,	-1.0f,  0.0f,  0.0f,	0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,	-1.0f,  0.0f,  0.0f,	0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,	-1.0f,  0.0f,  0.0f,    0.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,	-1.0f,  0.0f,  0.0f,    1.0f, 0.0f,
 
-		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,		1.0f,  0.0f,  0.0f,     1.0f, 0.0f,
+		0.5f,  0.5f, -0.5f,		1.0f,  0.0f,  0.0f,	    1.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,		1.0f,  0.0f,  0.0f,     0.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,		1.0f,  0.0f,  0.0f,     0.0f, 1.0f,
+		0.5f, -0.5f,  0.5f,		1.0f,  0.0f,  0.0f,     0.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,		1.0f,  0.0f,  0.0f,     1.0f, 0.0f,
 
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,     0.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,		0.0f, -1.0f,  0.0f,     1.0f, 1.0f,
+		0.5f, -0.5f,  0.5f,		0.0f, -1.0f,  0.0f,     1.0f, 0.0f,
+		0.5f, -0.5f,  0.5f,		0.0f, -1.0f,  0.0f,     1.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,	0.0f, -1.0f,  0.0f,     0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,	0.0f, -1.0f,  0.0f,     0.0f, 1.0f,
 
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+		-0.5f,  0.5f, -0.5f,	0.0f,  1.0f,  0.0f,     0.0f, 1.0f,
+		0.5f,  0.5f, -0.5f,		0.0f,  1.0f,  0.0f,	    1.0f, 1.0f,
+		0.5f,  0.5f,  0.5f,		0.0f,  1.0f,  0.0f,     1.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,		0.0f,  1.0f,  0.0f,     1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,	0.0f,  1.0f,  0.0f,     0.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,	0.0f,  1.0f,  0.0f,     0.0f, 1.0f
 	};
 
 	//初始化顶点数组对象
@@ -104,11 +103,13 @@ void loadModels() {
 	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexs), indexs, GL_STATIC_DRAW);
 
 	//4.设置顶点属性指针（位置）
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
-	//设置顶点属性指针（纹理）
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(1);
+	//设置顶点属性指针（纹理）
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(2);
 
 	//5.解绑VA0
 	glBindVertexArray(0);
@@ -126,43 +127,87 @@ void loadModels() {
 }
 
 void loadTexture() {
-	g_LTexture_0 = LTexture("wall.jpg");
-	g_LTexture_1 = LTexture("face.png");
+	g_LTexture_0 = LTexture(ResourcePath("wall.jpg").c_str());
+	g_LTexture_1 = LTexture(ResourcePath("face.png").c_str());
 }
 
-void render() {
-	// 清除颜色和深度缓存
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+void setLightShaderAttrib(LCamera &in_cameraObj, LShader &in_shaderPro)
+{
+	//设置光源颜色
+	glUniform3f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_light_color"), 1.f, 1.f, 1.f);
+	//设置光源位置
+	glUniform3f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_light_pos"), g_lightPos.x, g_lightPos.y, g_lightPos.z);
+	//设置物体颜色
+	glUniform3f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_obj_color"), 1.0f, 0.5f, 0.31f);
+	//设置shader中摄像机位置
+	glUniform3f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_camera_pos"), in_cameraObj.getPosition().x,
+		in_cameraObj.getPosition().y, in_cameraObj.getPosition().z);
+}
 
-	g_LShaderObj.useProgram();
+void renderLightSource(LCamera &in_cameraObj) {
+	g_lightShader.useProgram();
 
 	// 变换矩阵从右往左读
 	glm::mat4 modelMat;
-	modelMat = glm::rotate(modelMat, glm::radians(0.f), glm::vec3(0.2, 0.7, 0.4));
-	GLint uf_loc_model = glGetUniformLocation(g_LShaderObj.getShaderProgram(), "uf_modelMat");
+	modelMat = glm::translate(modelMat, g_lightPos);
+	glm::mat4 scaleMat;
+	scaleMat = glm::scale(scaleMat, glm::vec3(1.f, 1.f, 1.f));
+	modelMat = modelMat * scaleMat;
+	GLint uf_loc_model = glGetUniformLocation(g_lightShader.getShaderProgram(), "uf_modelMat");
 	glUniformMatrix4fv(uf_loc_model, 1, GL_FALSE, glm::value_ptr(modelMat));
 
 	glm::mat4 viewMat;
-	//viewMat = glm::translate(viewMat, glm::vec3(0.0, 0.0, -3.0));
-	//viewMat = glm::lookAt(cameraPos, cameraPos + camera_face_dir, camera_up_dir);
-	viewMat = cameraObj.getProjectionMat();
-	GLint uf_loc_view = glGetUniformLocation(g_LShaderObj.getShaderProgram(), "uf_viewMat");
+	viewMat = in_cameraObj.getProjectionMat();
+	GLint uf_loc_view = glGetUniformLocation(g_lightShader.getShaderProgram(), "uf_viewMat");
 	glUniformMatrix4fv(uf_loc_view, 1, GL_FALSE, glm::value_ptr(viewMat));
 
 	glm::mat4 projectionMat;
 	projectionMat = glm::perspective(45.0f, (WindowWidth / WindwoHeight), 0.1f, 100.f);
-	GLint uf_loc_proj = glGetUniformLocation(g_LShaderObj.getShaderProgram(), "uf_projectionMat");
+	GLint uf_loc_proj = glGetUniformLocation(g_lightShader.getShaderProgram(), "uf_projectionMat");
+	glUniformMatrix4fv(uf_loc_proj, 1, GL_FALSE, glm::value_ptr(projectionMat));
+
+	//绑定VAO的同时也会自动绑定EBO
+	glBindVertexArray(VAO);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
+}
+
+void renderCube(LCamera &in_cameraObj) {
+	// 清除颜色和深度缓存
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	g_cubeShader.useProgram();
+
+	setLightShaderAttrib(in_cameraObj, g_cubeShader);
+
+	// 变换矩阵从右往左读
+	glm::mat4 modelMat;
+	modelMat = glm::translate(modelMat, glm::vec3(4.f, 2.f, 0.f));
+	glm::mat4 scaleMat;
+	scaleMat = glm::scale(scaleMat, glm::vec3(1.f, 1.f, 1.f));
+	modelMat = modelMat * scaleMat;
+	GLint uf_loc_model = glGetUniformLocation(g_cubeShader.getShaderProgram(), "uf_modelMat");
+	glUniformMatrix4fv(uf_loc_model, 1, GL_FALSE, glm::value_ptr(modelMat));
+
+	glm::mat4 viewMat;
+	viewMat = in_cameraObj.getProjectionMat();
+	GLint uf_loc_view = glGetUniformLocation(g_cubeShader.getShaderProgram(), "uf_viewMat");
+	glUniformMatrix4fv(uf_loc_view, 1, GL_FALSE, glm::value_ptr(viewMat));
+
+	glm::mat4 projectionMat;
+	projectionMat = glm::perspective(45.0f, (WindowWidth / WindwoHeight), 0.1f, 100.f);
+	GLint uf_loc_proj = glGetUniformLocation(g_cubeShader.getShaderProgram(), "uf_projectionMat");
 	glUniformMatrix4fv(uf_loc_proj, 1, GL_FALSE, glm::value_ptr(projectionMat));
 
 	//在绑定纹理之前先激活纹理单元
 	glActiveTexture(GL_TEXTURE0);
 	//绑定2D纹理
 	glBindTexture(GL_TEXTURE_2D, g_LTexture_0.getTexObj());
-	glUniform1i(glGetUniformLocation(g_LShaderObj.getShaderProgram(), "uf_texture_0"), 0);
+	glUniform1i(glGetUniformLocation(g_cubeShader.getShaderProgram(), "uf_tex_diff_0"), 0);
 
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, g_LTexture_1.getTexObj());
-	glUniform1i(glGetUniformLocation(g_LShaderObj.getShaderProgram(), "uf_texture_1"), 1);
+	glUniform1i(glGetUniformLocation(g_cubeShader.getShaderProgram(), "uf_tex_spec_0"), 1);
 
 	//绑定VAO的同时也会自动绑定EBO
 	glBindVertexArray(VAO);
