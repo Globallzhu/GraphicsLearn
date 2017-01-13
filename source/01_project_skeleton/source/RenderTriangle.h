@@ -12,11 +12,11 @@
 
 #include "LShader.h"
 #include "LTexture.h"
+#include "LCamera.h"
 
-void loadShaders();
-void loadModels();
-void loadTexture();
-void render();
+void loadTriShaders();
+void loadTriModels();
+void renderTrigle(LCamera &in_cameraObj);
 
 
 #endif // !_RENDER_TRIANGLE_CPP_

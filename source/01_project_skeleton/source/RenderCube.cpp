@@ -1,6 +1,7 @@
+#include "Global.h"
 #include "RenderCube.h"
-#include "LCamera.h"
 #include "platform.hpp"
+#include "RenderTriangle.h"
 
 //定义全局变量
 GLuint VAO = 0;
@@ -10,6 +11,8 @@ LShader g_lightShader;
 LShader g_cubeShader;
 LTexture g_LTexture_0;
 LTexture g_LTexture_1;
+LTexture g_LTex_woodBox;
+LTexture g_LTex_boxSpecular;
 
 glm::vec3 g_lightPos = glm::vec3(3.5f, 4.f, 0.f);
 
@@ -117,11 +120,6 @@ void loadModels() {
 	//线框模式
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	//查看支持的最大顶点属性数量
-	GLint nrAttributes;
-	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
-	std::cout << "Maximum number of vertex attributes supported: " << nrAttributes << std::endl;
-
 	// 启用深度测试
 	glEnable(GL_DEPTH_TEST);
 }
@@ -129,19 +127,33 @@ void loadModels() {
 void loadTexture() {
 	g_LTexture_0 = LTexture(ResourcePath("wall.jpg").c_str());
 	g_LTexture_1 = LTexture(ResourcePath("face.png").c_str());
+	g_LTex_woodBox = LTexture(ResourcePath("woodenBox.png").c_str());
+	g_LTex_boxSpecular = LTexture(ResourcePath("box_specular.png").c_str());
 }
 
 void setLightShaderAttrib(LCamera &in_cameraObj, LShader &in_shaderPro)
 {
 	//设置光源颜色
-	glUniform3f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_light_color"), 1.f, 1.f, 1.f);
+	//glUniform3f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_light_color"), 1.f, 1.f, 1.f);
 	//设置光源位置
-	glUniform3f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_light_pos"), g_lightPos.x, g_lightPos.y, g_lightPos.z);
+	//glUniform3f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_light_pos"), g_lightPos.x, g_lightPos.y, g_lightPos.z);
 	//设置物体颜色
 	glUniform3f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_obj_color"), 1.0f, 0.5f, 0.31f);
 	//设置shader中摄像机位置
 	glUniform3f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_camera_pos"), in_cameraObj.getPosition().x,
 		in_cameraObj.getPosition().y, in_cameraObj.getPosition().z);
+
+	//设置材质
+	glUniform3f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_material.ambient"), 1.f, 0.5f, 0.31f);
+	glUniform3f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_material.diffuse"), 1.f, 0.5f, 0.31f);
+	glUniform3f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_material.specular"), 0.5f, 0.5f, 0.5f);
+	glUniform1f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_material.shininess"), 32);
+
+	//设置光属性
+	glUniform3f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_light.ambient"), 0.1f, 0.1f, 0.1f);
+	glUniform3f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_light.diffuse"), 0.6f, 0.6f, 0.6f);
+	glUniform3f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_light.specular"), 1.f, 1.0f, 1.f);
+	glUniform3f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_light.position"), g_lightPos.x, g_lightPos.y, g_lightPos.z);
 }
 
 void renderLightSource(LCamera &in_cameraObj) {
@@ -182,7 +194,7 @@ void renderCube(LCamera &in_cameraObj) {
 
 	// 变换矩阵从右往左读
 	glm::mat4 modelMat;
-	modelMat = glm::translate(modelMat, glm::vec3(4.f, 2.f, 0.f));
+	modelMat = glm::translate(modelMat, glm::vec3(4.5f, 1.8f, 0.f));
 	glm::mat4 scaleMat;
 	scaleMat = glm::scale(scaleMat, glm::vec3(1.f, 1.f, 1.f));
 	modelMat = modelMat * scaleMat;
@@ -202,12 +214,15 @@ void renderCube(LCamera &in_cameraObj) {
 	//在绑定纹理之前先激活纹理单元
 	glActiveTexture(GL_TEXTURE0);
 	//绑定2D纹理
-	glBindTexture(GL_TEXTURE_2D, g_LTexture_0.getTexObj());
-	glUniform1i(glGetUniformLocation(g_cubeShader.getShaderProgram(), "uf_tex_diff_0"), 0);
+	glBindTexture(GL_TEXTURE_2D, g_LTex_woodBox.getTexObj());
+	//glUniform1i(glGetUniformLocation(g_cubeShader.getShaderProgram(), "uf_tex_diff_0"), 0);
+	glUniform1i(glGetUniformLocation(g_cubeShader.getShaderProgram(), "uf_material.dissuse_tex_0"), 0);
+
 
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, g_LTexture_1.getTexObj());
-	glUniform1i(glGetUniformLocation(g_cubeShader.getShaderProgram(), "uf_tex_spec_0"), 1);
+	glBindTexture(GL_TEXTURE_2D, g_LTex_boxSpecular.getTexObj());
+	//glUniform1i(glGetUniformLocation(g_cubeShader.getShaderProgram(), "uf_tex_spec_0"), 1);
+	glUniform1i(glGetUniformLocation(g_cubeShader.getShaderProgram(), "uf_material.specular_tex_0"), 1);
 
 	//绑定VAO的同时也会自动绑定EBO
 	glBindVertexArray(VAO);

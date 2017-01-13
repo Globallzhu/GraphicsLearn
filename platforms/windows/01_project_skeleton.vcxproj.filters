@@ -42,6 +42,9 @@
     <ClCompile Include="..\..\source\01_project_skeleton\source\ModelReader\LMModel.cpp">
       <Filter>source\ModelReader</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\01_project_skeleton\source\RenderTriangle.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\01_project_skeleton\source\LShader.h">
@@ -61,6 +64,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\01_project_skeleton\source\ModelReader\LMModel.h">
       <Filter>source\ModelReader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\01_project_skeleton\source\RenderTriangle.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\01_project_skeleton\source\Global.h">
+      <Filter>source</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

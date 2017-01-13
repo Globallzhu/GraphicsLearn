@@ -15,9 +15,6 @@
 #include "LTexture.h"
 #include "LCamera.h"
 
-const float WindowWidth = 960.f;
-const float WindwoHeight = 640.f;
-
 void loadShaders();
 void loadModels();
 void loadTexture();

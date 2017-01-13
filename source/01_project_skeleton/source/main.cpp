@@ -8,13 +8,12 @@
 #include <iostream>
 #include <stdexcept>
 
-//#include "RenderTriangle.h"
+#include "Global.h"
+#include "RenderTriangle.h"
 #include "RenderCube.h"
 #include "LCamera.h"
 #include "ModelReader/LMModel.h"
 
-extern const float WindowWidth;
-extern const float WindwoHeight;
 extern glm::vec3 g_lightPos;
 
 LCamera cameraObj;
@@ -85,7 +84,6 @@ void mouse_callback(GLFWwindow* window, double pos_x, double pos_y) {
 }
 
 void readerModel(LCamera &in_cameraObj, LShader &in_shaderPro, LMModel &in_modelObj) {
-
 	in_shaderPro.useProgram();
 
 	setLightShaderAttrib(in_cameraObj, in_shaderPro);
@@ -167,6 +165,9 @@ void AppMain() {
 
 	cameraObj = LCamera(glm::vec3(0.f, 3.5f, 3.f));
 
+	loadTriModels();
+	loadTriShaders();
+
     loadShaders();
     loadModels();
 	loadTexture();
@@ -186,6 +187,7 @@ void AppMain() {
 		// 清除颜色和深度缓存
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         // draw one frame
+		renderTrigle(cameraObj);
 		renderLightSource(cameraObj);
 		renderCube(cameraObj);
 

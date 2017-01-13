@@ -25,11 +25,11 @@ void LMMesh::draw(LShader &in_shaderPro)
 	for (GLuint  i = 0; i < this->m_textures.size(); i++) {
 		char uf_name[64];
 		if (this->m_textures[i].m_type == LMTextureType::Diffuse) {
-			sprintf_s(uf_name, "uf_tex_diff_%d", diffuseIdx);
+			sprintf_s(uf_name, "uf_material.dissuse_tex_%d", diffuseIdx);
 			diffuseIdx++;
 		}
 		else if (this->m_textures[i].m_type == LMTextureType::Specular) {
-			sprintf_s(uf_name, "uf_tex_spec_%d", specularIdx);
+			sprintf_s(uf_name, "uf_material.specular_tex_%d", specularIdx);
 			specularIdx++;
 		}
 
