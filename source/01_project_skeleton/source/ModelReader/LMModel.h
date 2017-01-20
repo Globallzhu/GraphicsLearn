@@ -16,7 +16,7 @@ public:
 	~LMModel();
 	LMModel(const char* in_fileName);
 
-	void draw(LShader &in_shaderPro);
+	void draw(LShader* in_pShaderPro);
 private:
 	vector<LMMesh> m_meshes;
 	vector<LMTexture> m_loadedTexes;

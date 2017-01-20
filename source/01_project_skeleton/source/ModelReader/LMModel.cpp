@@ -15,10 +15,10 @@ LMModel::LMModel(const char* in_fileName)
 	this->initModel(in_fileName);
 }
 
-void LMModel::draw(LShader &in_shaderPro)
+void LMModel::draw(LShader* in_pShaderPro)
 {
 	for (GLuint  i = 0; i < this->m_meshes.size(); i++) {
-		this->m_meshes[i].draw(in_shaderPro);
+		this->m_meshes[i].draw(in_pShaderPro);
 	}
 }
 

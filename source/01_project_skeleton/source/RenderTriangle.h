@@ -16,7 +16,7 @@
 
 void loadTriShaders();
 void loadTriModels();
-void renderTrigle(LCamera &in_cameraObj);
+void renderTrigle(LCamera* in_pCameraObj);
 
 
 #endif // !_RENDER_TRIANGLE_CPP_

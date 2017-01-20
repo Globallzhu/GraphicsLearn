@@ -17,7 +17,7 @@ LMMesh::LMMesh(const vector<LMVertex> in_vertices, const vector<GLuint> in_index
 	this->initMesh();
 }
 
-void LMMesh::draw(LShader &in_shaderPro)
+void LMMesh::draw(LShader* in_pShaderPro)
 {	
 	int diffuseIdx = 0;
 	int specularIdx = 0;
@@ -35,7 +35,7 @@ void LMMesh::draw(LShader &in_shaderPro)
 
 		glActiveTexture(GL_TEXTURE0 + i);
 		glBindTexture(GL_TEXTURE_2D, this->m_textures[i].m_id);
-		glUniform1i(glGetUniformLocation(in_shaderPro.getShaderProgram(), uf_name), i);
+		glUniform1i(glGetUniformLocation(in_pShaderPro->getShaderProgram(), uf_name), i);
 
 	}
 

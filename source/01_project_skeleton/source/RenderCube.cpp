@@ -7,8 +7,8 @@
 GLuint VAO = 0;
 GLuint VBO = 0;
 GLuint EBO = 0;
-LShader g_lightShader;
-LShader g_cubeShader;
+LShader* g_lightShader = nullptr;
+LShader* g_cubeShader = nullptr;
 LTexture g_LTexture_0;
 LTexture g_LTexture_1;
 LTexture g_LTex_woodBox;
@@ -17,8 +17,8 @@ LTexture g_LTex_boxSpecular;
 glm::vec3 g_lightPos = glm::vec3(3.5f, 4.f, 0.f);
 
 void loadShaders() {
-	g_lightShader = LShader(SHADER_CREATE_TYPE::FILE_NAME, "renderCube.vs", "renderLight.frag");
-	g_cubeShader = LShader(SHADER_CREATE_TYPE::FILE_NAME, "renderCube.vs", "renderModel.frag");
+	g_lightShader = new LShader(SHADER_CREATE_TYPE::FILE_NAME, "renderCube.vs", "renderLight.frag");
+	g_cubeShader = new LShader(SHADER_CREATE_TYPE::FILE_NAME, "renderCube.vs", "renderModel.frag");
 }
 
 void loadModels() {
@@ -131,33 +131,33 @@ void loadTexture() {
 	g_LTex_boxSpecular = LTexture(ResourcePath("box_specular.png").c_str());
 }
 
-void setLightShaderAttrib(LCamera &in_cameraObj, LShader &in_shaderPro)
+void setLightShaderAttrib(LCamera* in_pCameraObj, LShader* in_pShaderPro)
 {
 	//设置光源颜色
 	//glUniform3f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_light_color"), 1.f, 1.f, 1.f);
 	//设置光源位置
 	//glUniform3f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_light_pos"), g_lightPos.x, g_lightPos.y, g_lightPos.z);
 	//设置物体颜色
-	glUniform3f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_obj_color"), 1.0f, 0.5f, 0.31f);
+	glUniform3f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_obj_color"), 1.0f, 0.5f, 0.31f);
 	//设置shader中摄像机位置
-	glUniform3f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_camera_pos"), in_cameraObj.getPosition().x,
-		in_cameraObj.getPosition().y, in_cameraObj.getPosition().z);
+	glUniform3f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_camera_pos"), in_pCameraObj->getPosition().x,
+		in_pCameraObj->getPosition().y, in_pCameraObj->getPosition().z);
 
 	//设置材质
-	glUniform3f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_material.ambient"), 1.f, 0.5f, 0.31f);
-	glUniform3f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_material.diffuse"), 1.f, 0.5f, 0.31f);
-	glUniform3f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_material.specular"), 0.5f, 0.5f, 0.5f);
-	glUniform1f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_material.shininess"), 32);
+	glUniform3f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_material.ambient"), 1.f, 0.5f, 0.31f);
+	glUniform3f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_material.diffuse"), 1.f, 0.5f, 0.31f);
+	glUniform3f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_material.specular"), 0.5f, 0.5f, 0.5f);
+	glUniform1f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_material.shininess"), 32);
 
 	//设置光属性
-	glUniform3f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_light.ambient"), 0.1f, 0.1f, 0.1f);
-	glUniform3f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_light.diffuse"), 0.6f, 0.6f, 0.6f);
-	glUniform3f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_light.specular"), 1.f, 1.0f, 1.f);
-	glUniform3f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_light.position"), g_lightPos.x, g_lightPos.y, g_lightPos.z);
+	glUniform3f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_light.ambient"), 0.1f, 0.1f, 0.1f);
+	glUniform3f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_light.diffuse"), 0.6f, 0.6f, 0.6f);
+	glUniform3f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_light.specular"), 1.f, 1.0f, 1.f);
+	glUniform3f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_light.position"), g_lightPos.x, g_lightPos.y, g_lightPos.z);
 }
 
-void renderLightSource(LCamera &in_cameraObj) {
-	g_lightShader.useProgram();
+void renderLightSource(LCamera* in_pCameraObj) {
+	g_lightShader->useProgram();
 
 	// 变换矩阵从右往左读
 	glm::mat4 modelMat;
@@ -165,17 +165,17 @@ void renderLightSource(LCamera &in_cameraObj) {
 	glm::mat4 scaleMat;
 	scaleMat = glm::scale(scaleMat, glm::vec3(1.f, 1.f, 1.f));
 	modelMat = modelMat * scaleMat;
-	GLint uf_loc_model = glGetUniformLocation(g_lightShader.getShaderProgram(), "uf_modelMat");
+	GLint uf_loc_model = glGetUniformLocation(g_lightShader->getShaderProgram(), "uf_modelMat");
 	glUniformMatrix4fv(uf_loc_model, 1, GL_FALSE, glm::value_ptr(modelMat));
 
 	glm::mat4 viewMat;
-	viewMat = in_cameraObj.getProjectionMat();
-	GLint uf_loc_view = glGetUniformLocation(g_lightShader.getShaderProgram(), "uf_viewMat");
+	viewMat = in_pCameraObj->getProjectionMat();
+	GLint uf_loc_view = glGetUniformLocation(g_lightShader->getShaderProgram(), "uf_viewMat");
 	glUniformMatrix4fv(uf_loc_view, 1, GL_FALSE, glm::value_ptr(viewMat));
 
 	glm::mat4 projectionMat;
 	projectionMat = glm::perspective(45.0f, (WindowWidth / WindwoHeight), 0.1f, 100.f);
-	GLint uf_loc_proj = glGetUniformLocation(g_lightShader.getShaderProgram(), "uf_projectionMat");
+	GLint uf_loc_proj = glGetUniformLocation(g_lightShader->getShaderProgram(), "uf_projectionMat");
 	glUniformMatrix4fv(uf_loc_proj, 1, GL_FALSE, glm::value_ptr(projectionMat));
 
 	//绑定VAO的同时也会自动绑定EBO
@@ -184,13 +184,13 @@ void renderLightSource(LCamera &in_cameraObj) {
 	glBindVertexArray(0);
 }
 
-void renderCube(LCamera &in_cameraObj) {
+void renderCube(LCamera* in_pCameraObj) {
 	// 清除颜色和深度缓存
 	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	g_cubeShader.useProgram();
+	g_cubeShader->useProgram();
 
-	setLightShaderAttrib(in_cameraObj, g_cubeShader);
+	setLightShaderAttrib(in_pCameraObj, g_cubeShader);
 
 	// 变换矩阵从右往左读
 	glm::mat4 modelMat;
@@ -198,17 +198,17 @@ void renderCube(LCamera &in_cameraObj) {
 	glm::mat4 scaleMat;
 	scaleMat = glm::scale(scaleMat, glm::vec3(1.f, 1.f, 1.f));
 	modelMat = modelMat * scaleMat;
-	GLint uf_loc_model = glGetUniformLocation(g_cubeShader.getShaderProgram(), "uf_modelMat");
+	GLint uf_loc_model = glGetUniformLocation(g_cubeShader->getShaderProgram(), "uf_modelMat");
 	glUniformMatrix4fv(uf_loc_model, 1, GL_FALSE, glm::value_ptr(modelMat));
 
 	glm::mat4 viewMat;
-	viewMat = in_cameraObj.getProjectionMat();
-	GLint uf_loc_view = glGetUniformLocation(g_cubeShader.getShaderProgram(), "uf_viewMat");
+	viewMat = in_pCameraObj->getProjectionMat();
+	GLint uf_loc_view = glGetUniformLocation(g_cubeShader->getShaderProgram(), "uf_viewMat");
 	glUniformMatrix4fv(uf_loc_view, 1, GL_FALSE, glm::value_ptr(viewMat));
 
 	glm::mat4 projectionMat;
 	projectionMat = glm::perspective(45.0f, (WindowWidth / WindwoHeight), 0.1f, 100.f);
-	GLint uf_loc_proj = glGetUniformLocation(g_cubeShader.getShaderProgram(), "uf_projectionMat");
+	GLint uf_loc_proj = glGetUniformLocation(g_cubeShader->getShaderProgram(), "uf_projectionMat");
 	glUniformMatrix4fv(uf_loc_proj, 1, GL_FALSE, glm::value_ptr(projectionMat));
 
 	//在绑定纹理之前先激活纹理单元
@@ -216,13 +216,13 @@ void renderCube(LCamera &in_cameraObj) {
 	//绑定2D纹理
 	glBindTexture(GL_TEXTURE_2D, g_LTex_woodBox.getTexObj());
 	//glUniform1i(glGetUniformLocation(g_cubeShader.getShaderProgram(), "uf_tex_diff_0"), 0);
-	glUniform1i(glGetUniformLocation(g_cubeShader.getShaderProgram(), "uf_material.dissuse_tex_0"), 0);
+	glUniform1i(glGetUniformLocation(g_cubeShader->getShaderProgram(), "uf_material.dissuse_tex_0"), 0);
 
 
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, g_LTex_boxSpecular.getTexObj());
 	//glUniform1i(glGetUniformLocation(g_cubeShader.getShaderProgram(), "uf_tex_spec_0"), 1);
-	glUniform1i(glGetUniformLocation(g_cubeShader.getShaderProgram(), "uf_material.specular_tex_0"), 1);
+	glUniform1i(glGetUniformLocation(g_cubeShader->getShaderProgram(), "uf_material.specular_tex_0"), 1);
 
 	//绑定VAO的同时也会自动绑定EBO
 	glBindVertexArray(VAO);

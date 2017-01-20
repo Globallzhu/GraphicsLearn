@@ -3,18 +3,18 @@
 #include "RenderCube.h"
 
 extern LTexture g_LTexture_0;
-extern LShader g_lightShader;
+//extern LShader g_lightShader;
 
 //定义全局变量
 GLuint tri_VAO = 0;
 GLuint tri_VBO = 0;
 GLuint tri_EBO = 0;
-LShader g_LShaderObj;
+LShader* g_LShaderObj = nullptr;
 
 
 void loadTriShaders() {
 	//g_LShaderObj = LShader(SHADER_CREATE_TYPE::CODE, vertexShaderCode, fragmentShaderCode);
-	g_LShaderObj = LShader(SHADER_CREATE_TYPE::FILE_NAME, "renderCube.vs", "renderModel.frag");
+	g_LShaderObj = new LShader(SHADER_CREATE_TYPE::FILE_NAME, "renderCube.vs", "renderModel.frag");
 }
 
 void loadTriModels() {
@@ -78,13 +78,13 @@ void loadTriModels() {
 	std::cout << "Maximum number of vertex attributes supported: " << nrAttributes << std::endl;
 }
 
-void renderTrigle(LCamera &in_cameraObj) {
+void renderTrigle(LCamera* in_pCameraObj) {
 	// clear everything
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	g_LShaderObj.useProgram();
+	g_LShaderObj->useProgram();
 
-	setLightShaderAttrib(in_cameraObj, g_LShaderObj);
+	setLightShaderAttrib(in_pCameraObj, g_LShaderObj);
 
 	// 变换矩阵从右往左读
 	glm::mat4 modelMat;
@@ -92,17 +92,17 @@ void renderTrigle(LCamera &in_cameraObj) {
 	//glm::mat4 scaleMat;
 	//scaleMat = glm::scale(scaleMat, glm::vec3(10.f, 10.f, 10.f));
 	//modelMat = modelMat * scaleMat;
-	GLint uf_loc_model = glGetUniformLocation(g_LShaderObj.getShaderProgram(), "uf_modelMat");
+	GLint uf_loc_model = glGetUniformLocation(g_LShaderObj->getShaderProgram(), "uf_modelMat");
 	glUniformMatrix4fv(uf_loc_model, 1, GL_FALSE, glm::value_ptr(modelMat));
 
 	glm::mat4 viewMat;
-	viewMat = in_cameraObj.getProjectionMat();
-	GLint uf_loc_view = glGetUniformLocation(g_LShaderObj.getShaderProgram(), "uf_viewMat");
+	viewMat = in_pCameraObj->getProjectionMat();
+	GLint uf_loc_view = glGetUniformLocation(g_LShaderObj->getShaderProgram(), "uf_viewMat");
 	glUniformMatrix4fv(uf_loc_view, 1, GL_FALSE, glm::value_ptr(viewMat));
 
 	glm::mat4 projectionMat;
 	projectionMat = glm::perspective(45.0f, (WindowWidth / WindwoHeight), 0.1f, 100.f);
-	GLint uf_loc_proj = glGetUniformLocation(g_LShaderObj.getShaderProgram(), "uf_projectionMat");
+	GLint uf_loc_proj = glGetUniformLocation(g_LShaderObj->getShaderProgram(), "uf_projectionMat");
 	glUniformMatrix4fv(uf_loc_proj, 1, GL_FALSE, glm::value_ptr(projectionMat));
 
 	//在绑定纹理之前先激活纹理单元
@@ -110,7 +110,7 @@ void renderTrigle(LCamera &in_cameraObj) {
 	//绑定2D纹理
 	glBindTexture(GL_TEXTURE_2D, g_LTexture_0.getTexObj());
 	//glUniform1i(glGetUniformLocation(g_LShaderObj.getShaderProgram(), "uf_tex_diff_0"), 0);
-	glUniform1i(glGetUniformLocation(g_LShaderObj.getShaderProgram(), "uf_material.dissuse_tex_0"), 0);
+	glUniform1i(glGetUniformLocation(g_LShaderObj->getShaderProgram(), "uf_material.dissuse_tex_0"), 0);
 
 	//绑定VAO的同时也会自动绑定EBO
 	glBindVertexArray(tri_VAO);

@@ -15,8 +15,11 @@
 #include "ModelReader/LMModel.h"
 
 extern glm::vec3 g_lightPos;
+extern LShader* g_LShaderObj;
+extern LShader* g_cubeShader;
+extern LShader* g_lightShader;
 
-LCamera cameraObj;
+LCamera* pCameraObj = nullptr;
 
 bool keys_status[1024];
 GLfloat deltaTime = 0.f;
@@ -55,16 +58,16 @@ void cameraMovement() {
 	lastTime = glfwGetTime();
 
 	if (keys_status[GLFW_KEY_W]) {
-		cameraObj.move(CAMERA_MOVE_DIR::FRONT, deltaTime);
+		pCameraObj->move(CAMERA_MOVE_DIR::FRONT, deltaTime);
 	}
 	if(keys_status[GLFW_KEY_S]) {
-		cameraObj.move(CAMERA_MOVE_DIR::BACK, deltaTime);
+		pCameraObj->move(CAMERA_MOVE_DIR::BACK, deltaTime);
 	}
 	if (keys_status[GLFW_KEY_A]) {
-		cameraObj.move(CAMERA_MOVE_DIR::LEFT, deltaTime);
+		pCameraObj->move(CAMERA_MOVE_DIR::LEFT, deltaTime);
 	}
 	if (keys_status[GLFW_KEY_D]) {
-		cameraObj.move(CAMERA_MOVE_DIR::RIGHT, deltaTime);
+		pCameraObj->move(CAMERA_MOVE_DIR::RIGHT, deltaTime);
 	}
 }
 
@@ -80,13 +83,13 @@ void mouse_callback(GLFWwindow* window, double pos_x, double pos_y) {
 	last_cursor_pos_x = pos_x;
 	last_cursor_pos_y = pos_y;
 
-	cameraObj.rotateByMouse(offset_x, offset_y);
+	pCameraObj->rotateByMouse(offset_x, offset_y);
 }
 
-void readerModel(LCamera &in_cameraObj, LShader &in_shaderPro, LMModel &in_modelObj) {
-	in_shaderPro.useProgram();
+void readerModel(LCamera* in_pCameraObj, LShader* in_pShaderPro, LMModel* in_pModelObj) {
+	in_pShaderPro->useProgram();
 
-	setLightShaderAttrib(in_cameraObj, in_shaderPro);
+	setLightShaderAttrib(in_pCameraObj, in_pShaderPro);
 	
 	glm::mat4 modelMat;
 	//modelMat = glm::rotate(modelMat, glm::radians(0.f), glm::vec3(0.2, 0.7, 0.4));
@@ -94,20 +97,21 @@ void readerModel(LCamera &in_cameraObj, LShader &in_shaderPro, LMModel &in_model
 	glm::mat4 scaleMat;
 	scaleMat = glm::scale(scaleMat, glm::vec3(0.3f, 0.3f, 0.3f));
 	modelMat = modelMat * scaleMat;
-	GLint uf_loc_model = glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_modelMat");
+	GLint uf_loc_model = glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_modelMat");
 	glUniformMatrix4fv(uf_loc_model, 1, GL_FALSE, glm::value_ptr(modelMat));
 
 	glm::mat4 viewMat;
-	viewMat = in_cameraObj.getProjectionMat();
-	GLint uf_loc_view = glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_viewMat");
+	viewMat = in_pCameraObj->getProjectionMat();
+	GLint uf_loc_view = glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_viewMat");
 	glUniformMatrix4fv(uf_loc_view, 1, GL_FALSE, glm::value_ptr(viewMat));
 
 	glm::mat4 projectionMat;
 	projectionMat = glm::perspective(45.0f, (WindowWidth / WindwoHeight), 0.1f, 100.f);
-	GLint uf_loc_proj = glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_projectionMat");
+	GLint uf_loc_proj = glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_projectionMat");
 	glUniformMatrix4fv(uf_loc_proj, 1, GL_FALSE, glm::value_ptr(projectionMat));
 
-	in_modelObj.draw(in_shaderPro);
+	//in_modelObj.draw(in_shaderPro);
+	in_pModelObj->draw(in_pShaderPro);
 }
 
 // the program starts here
@@ -163,7 +167,7 @@ void AppMain() {
 	// 设置清空颜色为黑色
 	glClearColor(0, 0, 0, 1); 
 
-	cameraObj = LCamera(glm::vec3(0.f, 3.5f, 3.f));
+	pCameraObj = new LCamera(glm::vec3(0.f, 3.5f, 3.f));
 
 	loadTriModels();
 	loadTriShaders();
@@ -172,8 +176,8 @@ void AppMain() {
     loadModels();
 	loadTexture();
 
-	LShader l_shaderPro = LShader(SHADER_CREATE_TYPE::FILE_NAME, "renderModel.vs", "renderModel.frag");
-	LMModel l_modelObj = LMModel("model\\nanosuit.obj");
+	LShader* pShaderPro = new LShader(SHADER_CREATE_TYPE::FILE_NAME, "renderModel.vs", "renderModel.frag");
+	LMModel* pModel = new LMModel("model\\nanosuit.obj");
 	// 启用深度测试
 	glEnable(GL_DEPTH_TEST);
 
@@ -187,11 +191,11 @@ void AppMain() {
 		// 清除颜色和深度缓存
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         // draw one frame
-		renderTrigle(cameraObj);
-		renderLightSource(cameraObj);
-		renderCube(cameraObj);
+		renderTrigle(pCameraObj);
+		renderLightSource(pCameraObj);
+		renderCube(pCameraObj);
 
-		readerModel(cameraObj, l_shaderPro, l_modelObj);
+		readerModel(pCameraObj, pShaderPro, pModel);
 
 		// swap the display buffers (displays what was just drawn)
 		glfwSwapBuffers(gWindow);
@@ -199,6 +203,15 @@ void AppMain() {
 
     // 释放glfw申请的内存
     glfwTerminate();
+
+	delete pModel;
+	pModel = nullptr;
+	delete g_LShaderObj;
+	g_LShaderObj = nullptr;
+	delete g_cubeShader;
+	g_cubeShader = nullptr;
+	delete g_lightShader;
+	g_lightShader = nullptr;
 }
 
 int main(int argc, char *argv[]) {

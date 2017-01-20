@@ -18,9 +18,9 @@
 void loadShaders();
 void loadModels();
 void loadTexture();
-void setLightShaderAttrib(LCamera &in_cameraObj, LShader &in_shaderPro);
-void renderLightSource(LCamera &in_cameraObj);
-void renderCube(LCamera &in_cameraObj);
+void setLightShaderAttrib(LCamera* in_pCameraObj, LShader* in_pShaderPro);
+void renderLightSource(LCamera* in_pCameraObj);
+void renderCube(LCamera* in_pCameraObj);
 
 
 #endif // !_RENDER_CUBE_H_
