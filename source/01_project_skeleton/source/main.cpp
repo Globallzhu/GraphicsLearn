@@ -2,6 +2,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <Windows.h>
 
 // standard C++ libraries
 #include <cassert>
@@ -28,11 +29,29 @@ bool bInitWindow = true;
 double last_cursor_pos_x = 0;
 double last_cursor_pos_y = 0;
 
+//获取帧数的一些变量
+GLfloat lastTimeForFrame = 0.f;
+GLfloat currentTimeForFrame = 0.f;
+GLint framesCount = 0;
+GLchar framesPrint[32];
+
 // globals
 GLFWwindow* gWindow = NULL;
 
 void OnError(int errorCode, const char* msg) {
     throw std::runtime_error(msg);
+}
+
+//计算帧数
+void calculateFrames() {
+	currentTimeForFrame = glfwGetTime();
+	framesCount++;
+	if ((currentTimeForFrame - lastTimeForFrame) > 1.f){
+		lastTimeForFrame = currentTimeForFrame;
+		sprintf(framesPrint, "FPS:%d", framesCount);
+		framesCount = 0;
+	}
+	std::cout << framesPrint << endl;
 }
 
 // 键盘按键回调
@@ -197,6 +216,8 @@ void AppMain() {
 
 		readerModel(pCameraObj, pShaderPro, pModel);
 
+		calculateFrames();
+
 		// swap the display buffers (displays what was just drawn)
 		glfwSwapBuffers(gWindow);
     }
@@ -212,6 +233,8 @@ void AppMain() {
 	g_cubeShader = nullptr;
 	delete g_lightShader;
 	g_lightShader = nullptr;
+	delete pCameraObj;
+	pCameraObj = nullptr;
 }
 
 int main(int argc, char *argv[]) {
