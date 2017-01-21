@@ -15,6 +15,8 @@
 #include "LCamera.h"
 #include "ModelReader/LMModel.h"
 
+const GLfloat pointLightSpeed = 1.5;
+
 extern glm::vec3 g_lightPos;
 extern LShader* g_LShaderObj;
 extern LShader* g_cubeShader;
@@ -51,7 +53,7 @@ void calculateFrames() {
 		sprintf(framesPrint, "FPS:%d", framesCount);
 		framesCount = 0;
 	}
-	std::cout << framesPrint << endl;
+	//std::cout << framesPrint << endl;
 }
 
 // 键盘按键回调
@@ -87,6 +89,27 @@ void cameraMovement() {
 	}
 	if (keys_status[GLFW_KEY_D]) {
 		pCameraObj->move(CAMERA_MOVE_DIR::RIGHT, deltaTime);
+	}
+}
+
+void pointLightMovement() {
+	if (keys_status[GLFW_KEY_I]) {
+		g_lightPos.z -= pointLightSpeed * deltaTime;
+	}
+	if (keys_status[GLFW_KEY_K]) {
+		g_lightPos.z += pointLightSpeed * deltaTime;
+	}
+	if (keys_status[GLFW_KEY_J]) {
+		g_lightPos.x -= pointLightSpeed * deltaTime;
+	}
+	if (keys_status[GLFW_KEY_L]) {
+		g_lightPos.x += pointLightSpeed * deltaTime;
+	}
+	if (keys_status[GLFW_KEY_O]) {
+		g_lightPos.y -= pointLightSpeed * deltaTime;
+	}
+	if (keys_status[GLFW_KEY_U]) {
+		g_lightPos.y += pointLightSpeed * deltaTime;
 	}
 }
 
@@ -206,6 +229,7 @@ void AppMain() {
         glfwPollEvents();
 
 		cameraMovement();
+		pointLightMovement();
 
 		// 清除颜色和深度缓存
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

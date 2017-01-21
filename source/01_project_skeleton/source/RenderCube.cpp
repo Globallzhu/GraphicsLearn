@@ -150,10 +150,21 @@ void setLightShaderAttrib(LCamera* in_pCameraObj, LShader* in_pShaderPro)
 	glUniform1f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_material.shininess"), 32);
 
 	//设置光属性
-	glUniform3f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_light.ambient"), 0.1f, 0.1f, 0.1f);
-	glUniform3f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_light.diffuse"), 0.6f, 0.6f, 0.6f);
-	glUniform3f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_light.specular"), 1.f, 1.0f, 1.f);
-	glUniform3f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_light.position"), g_lightPos.x, g_lightPos.y, g_lightPos.z);
+	//设置点光源
+	glUniform3f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_pointLight.ambient"), 0.1f, 0.1f, 0.1f);
+	glUniform3f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_pointLight.diffuse"), 0.9f, 0.9f, 0.9f);
+	glUniform3f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_pointLight.specular"), 1.f, 1.f, 1.f);
+	glUniform3f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_pointLight.position"), g_lightPos.x, g_lightPos.y, g_lightPos.z);
+	//设置点光源衰减系数(距离范围200)
+	glUniform1f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_pointLight.atten_Kc"), 1.f);
+	glUniform1f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_pointLight.atten_Kl"), 0.022f);
+	glUniform1f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_pointLight.atten_Kq"), 0.0019f);
+
+	//设置定向光
+	glUniform3f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_dirLight.ambient"), 0.2f, 0.2f, 0.2f);
+	glUniform3f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_dirLight.diffuse"), 0.7f, 0.7f, 0.7f);
+	glUniform3f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_dirLight.specular"), 1.f, 1.0f, 1.0f);
+	glUniform3f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_dirLight.direction"), 1.f, -1.5f, 0.f);
 }
 
 void renderLightSource(LCamera* in_pCameraObj) {
@@ -163,7 +174,7 @@ void renderLightSource(LCamera* in_pCameraObj) {
 	glm::mat4 modelMat;
 	modelMat = glm::translate(modelMat, g_lightPos);
 	glm::mat4 scaleMat;
-	scaleMat = glm::scale(scaleMat, glm::vec3(1.f, 1.f, 1.f));
+	scaleMat = glm::scale(scaleMat, glm::vec3(0.3f, 0.3f, 0.3f));
 	modelMat = modelMat * scaleMat;
 	GLint uf_loc_model = glGetUniformLocation(g_lightShader->getShaderProgram(), "uf_modelMat");
 	glUniformMatrix4fv(uf_loc_model, 1, GL_FALSE, glm::value_ptr(modelMat));

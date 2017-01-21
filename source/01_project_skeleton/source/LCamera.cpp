@@ -1,6 +1,6 @@
 #include "LCamera.h"
 
-const GLfloat CameraSpeed = 1.2f;
+const GLfloat CameraSpeed = 2.0f;
 const GLfloat MouseSensitivity = 0.075f;
 
 glm::vec3 LCamera::CameraUpDir = glm::vec3(0.f, 1.f, 0.f);
