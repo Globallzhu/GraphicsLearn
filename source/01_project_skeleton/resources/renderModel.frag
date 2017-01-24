@@ -47,6 +47,8 @@ uniform Material uf_material;
 uniform PointLight uf_pointLight;
 uniform DirLight uf_dirLight;
 
+
+/****************** 冯氏光照模型 ******************/
 // 计算镜面反射的参数
 float getSpecularPer(vec3 in_lightDir, vec3 in_normal_unit, vec3 in_cameraDir) {
 	vec3 light_reflect = reflect(-in_lightDir, in_normal_unit);
@@ -108,4 +110,7 @@ void main() {
 	vec3 pointLightColor = getPointLightColor(uf_pointLight, frag_obj_pos, normal_unit, cameraDir, l_obj_col, l_sep_col);
 	vec3 finalColor = dirLightColor + pointLightColor;
 	vertColor = vec4(finalColor , 1.0);
+
+	//用深度值来显示颜色(非线性)
+	//vertColor = vec4(vec3(gl_FragCoord.z), 1.0);
 };

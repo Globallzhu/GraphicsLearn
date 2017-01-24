@@ -17,7 +17,7 @@ LMMesh::LMMesh(const vector<LMVertex> in_vertices, const vector<GLuint> in_index
 	this->initMesh();
 }
 
-void LMMesh::draw(LShader* in_pShaderPro)
+void LMMesh::draw(LShader *in_pShaderPro)
 {	
 	int diffuseIdx = 0;
 	int specularIdx = 0;

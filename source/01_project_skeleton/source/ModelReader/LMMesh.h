@@ -47,7 +47,7 @@ public:
 	vector<GLuint> m_indexes;		//顶点索引数据
 	vector<LMTexture> m_textures;	
 
-	void draw(LShader* in_pShaderPro);
+	void draw(LShader *in_pShaderPro);
 private:
 	GLuint m_VAO;
 	GLuint m_VBO;

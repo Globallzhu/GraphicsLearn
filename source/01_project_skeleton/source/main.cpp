@@ -2,7 +2,6 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
-#include <Windows.h>
 
 // standard C++ libraries
 #include <cassert>
@@ -18,11 +17,11 @@
 const GLfloat pointLightSpeed = 1.5;
 
 extern glm::vec3 g_lightPos;
-extern LShader* g_LShaderObj;
-extern LShader* g_cubeShader;
-extern LShader* g_lightShader;
+extern LShader *g_LShaderObj;
+extern LShader *g_cubeShader;
+extern LShader *g_lightShader;
 
-LCamera* pCameraObj = nullptr;
+LCamera *pCameraObj = nullptr;
 
 bool keys_status[1024];
 GLfloat deltaTime = 0.f;
@@ -40,7 +39,7 @@ GLchar framesPrint[32];
 // globals
 GLFWwindow* gWindow = NULL;
 
-void OnError(int errorCode, const char* msg) {
+void OnError(int errorCode, const char *msg) {
     throw std::runtime_error(msg);
 }
 
@@ -57,7 +56,7 @@ void calculateFrames() {
 }
 
 // 键盘按键回调
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode) {
 
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(gWindow, GL_TRUE);
@@ -114,7 +113,7 @@ void pointLightMovement() {
 }
 
 //鼠标输入回调
-void mouse_callback(GLFWwindow* window, double pos_x, double pos_y) {
+void mouse_callback(GLFWwindow *window, double pos_x, double pos_y) {
 	if (bInitWindow) {
 		last_cursor_pos_x = pos_x;
 		last_cursor_pos_y = pos_y;
@@ -128,7 +127,7 @@ void mouse_callback(GLFWwindow* window, double pos_x, double pos_y) {
 	pCameraObj->rotateByMouse(offset_x, offset_y);
 }
 
-void readerModel(LCamera* in_pCameraObj, LShader* in_pShaderPro, LMModel* in_pModelObj) {
+void readerModel(LCamera *in_pCameraObj, LShader *in_pShaderPro, LMModel *in_pModelObj) {
 	in_pShaderPro->useProgram();
 
 	setLightShaderAttrib(in_pCameraObj, in_pShaderPro);
@@ -163,7 +162,7 @@ void AppMain() {
 	if (!glfwInit()) {
 		throw std::runtime_error("glfwInit failed");
 	}
-    
+
     // open a window with GLFW
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); //使用核心模式
@@ -222,6 +221,7 @@ void AppMain() {
 	LMModel* pModel = new LMModel("model\\nanosuit.obj");
 	// 启用深度测试
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
 
     // run while the window is open
     while(!glfwWindowShouldClose(gWindow)){
@@ -234,12 +234,11 @@ void AppMain() {
 		// 清除颜色和深度缓存
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         // draw one frame
-		renderTrigle(pCameraObj);
 		renderLightSource(pCameraObj);
 		renderCube(pCameraObj);
 
 		readerModel(pCameraObj, pShaderPro, pModel);
-
+		renderTrigle(pCameraObj);
 		calculateFrames();
 
 		// swap the display buffers (displays what was just drawn)

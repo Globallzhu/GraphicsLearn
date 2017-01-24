@@ -7,8 +7,8 @@
 GLuint VAO = 0;
 GLuint VBO = 0;
 GLuint EBO = 0;
-LShader* g_lightShader = nullptr;
-LShader* g_cubeShader = nullptr;
+LShader *g_lightShader = nullptr;
+LShader *g_cubeShader = nullptr;
 LTexture g_LTexture_0;
 LTexture g_LTexture_1;
 LTexture g_LTex_woodBox;
@@ -131,7 +131,7 @@ void loadTexture() {
 	g_LTex_boxSpecular = LTexture(ResourcePath("box_specular.png").c_str());
 }
 
-void setLightShaderAttrib(LCamera* in_pCameraObj, LShader* in_pShaderPro)
+void setLightShaderAttrib(LCamera *in_pCameraObj, LShader *in_pShaderPro)
 {
 	//设置光源颜色
 	//glUniform3f(glGetUniformLocation(in_shaderPro.getShaderProgram(), "uf_light_color"), 1.f, 1.f, 1.f);
@@ -162,12 +162,12 @@ void setLightShaderAttrib(LCamera* in_pCameraObj, LShader* in_pShaderPro)
 
 	//设置定向光
 	glUniform3f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_dirLight.ambient"), 0.2f, 0.2f, 0.2f);
-	glUniform3f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_dirLight.diffuse"), 0.7f, 0.7f, 0.7f);
+	glUniform3f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_dirLight.diffuse"), 0.71f, 0.71f, 0.71f);
 	glUniform3f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_dirLight.specular"), 1.f, 1.0f, 1.0f);
 	glUniform3f(glGetUniformLocation(in_pShaderPro->getShaderProgram(), "uf_dirLight.direction"), 1.f, -1.5f, 0.f);
 }
 
-void renderLightSource(LCamera* in_pCameraObj) {
+void renderLightSource(LCamera *in_pCameraObj) {
 	g_lightShader->useProgram();
 
 	// 变换矩阵从右往左读
@@ -195,17 +195,14 @@ void renderLightSource(LCamera* in_pCameraObj) {
 	glBindVertexArray(0);
 }
 
-void renderCube(LCamera* in_pCameraObj) {
-	// 清除颜色和深度缓存
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+void renderCube(LCamera *in_pCameraObj) {
 	g_cubeShader->useProgram();
 
 	setLightShaderAttrib(in_pCameraObj, g_cubeShader);
 
 	// 变换矩阵从右往左读
 	glm::mat4 modelMat;
-	modelMat = glm::translate(modelMat, glm::vec3(4.5f, 1.8f, 0.f));
+	modelMat = glm::translate(modelMat, glm::vec3(4.5f, 0.501f, 0.f));
 	glm::mat4 scaleMat;
 	scaleMat = glm::scale(scaleMat, glm::vec3(1.f, 1.f, 1.f));
 	modelMat = modelMat * scaleMat;
@@ -237,8 +234,6 @@ void renderCube(LCamera* in_pCameraObj) {
 
 	//绑定VAO的同时也会自动绑定EBO
 	glBindVertexArray(VAO);
-	//glDrawArrays(GL_TRIANGLES, 0, 3);
-	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindVertexArray(0);

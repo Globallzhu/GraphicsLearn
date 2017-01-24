@@ -79,8 +79,6 @@ void loadTriModels() {
 }
 
 void renderTrigle(LCamera* in_pCameraObj) {
-	// clear everything
-	glClear(GL_COLOR_BUFFER_BIT);
 
 	g_LShaderObj->useProgram();
 
@@ -88,7 +86,7 @@ void renderTrigle(LCamera* in_pCameraObj) {
 
 	// ±‰ªªæÿ’Û¥””“Õ˘◊Û∂¡
 	glm::mat4 modelMat;
-	modelMat = glm::translate(modelMat, glm::vec3(0.f, -0.5f, 0.f));
+	modelMat = glm::translate(modelMat, glm::vec3(0.f, 0.f, 0.f));
 	//glm::mat4 scaleMat;
 	//scaleMat = glm::scale(scaleMat, glm::vec3(10.f, 10.f, 10.f));
 	//modelMat = modelMat * scaleMat;

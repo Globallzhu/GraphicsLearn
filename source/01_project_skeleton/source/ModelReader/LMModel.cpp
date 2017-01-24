@@ -9,20 +9,20 @@ LMModel::~LMModel()
 {
 }
 
-LMModel::LMModel(const char* in_fileName)
+LMModel::LMModel(const char *in_fileName)
 {
 	this->m_directory = "";
 	this->initModel(in_fileName);
 }
 
-void LMModel::draw(LShader* in_pShaderPro)
+void LMModel::draw(LShader *in_pShaderPro)
 {
 	for (GLuint  i = 0; i < this->m_meshes.size(); i++) {
 		this->m_meshes[i].draw(in_pShaderPro);
 	}
 }
 
-void LMModel::initModel(const char* in_fileName)
+void LMModel::initModel(const char *in_fileName)
 {
 	string str_fullPath = ResourcePath(in_fileName);
 	
@@ -36,7 +36,7 @@ void LMModel::initModel(const char* in_fileName)
 	this->processNode(pScene->mRootNode, pScene);
 }
 
-void LMModel::processNode(const aiNode* in_pRootNode, const aiScene* in_pScene)
+void LMModel::processNode(const aiNode *in_pRootNode, const aiScene *in_pScene)
 {
 	//添加当前节点的所有网格
 	for (GLuint  i = 0; i < in_pRootNode->mNumMeshes; i++) {
@@ -51,7 +51,7 @@ void LMModel::processNode(const aiNode* in_pRootNode, const aiScene* in_pScene)
 	}
 }
 
-LMMesh LMModel::processMesh(const aiMesh * in_pMesh, const aiScene * in_pScene)
+LMMesh LMModel::processMesh(const aiMesh *in_pMesh, const aiScene *in_pScene)
 {
 	vector<LMVertex> vertices;
 	vector<GLuint> indexes;
@@ -100,7 +100,7 @@ LMMesh LMModel::processMesh(const aiMesh * in_pMesh, const aiScene * in_pScene)
 	return LMMesh(vertices, indexes, textures);
 }
 
-vector<LMTexture> LMModel::loadMaterialTexture(const aiMaterial * in_pMat, const aiTextureType in_texType, const LMTextureType in_type)
+vector<LMTexture> LMModel::loadMaterialTexture(const aiMaterial *in_pMat, const aiTextureType in_texType, const LMTextureType in_type)
 {
 	vector<LMTexture> out_textures;
 	for (GLuint  i = 0; i < in_pMat->GetTextureCount(in_texType); i++) {
