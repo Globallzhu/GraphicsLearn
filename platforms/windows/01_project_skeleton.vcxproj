@@ -111,6 +111,16 @@
     <None Include="..\..\source\01_project_skeleton\resources\renderLight.frag" />
     <None Include="..\..\source\01_project_skeleton\resources\renderModel.frag" />
     <None Include="..\..\source\01_project_skeleton\resources\renderModel.vs" />
+    <None Include="..\..\source\01_project_skeleton\resources\skybox.frag" />
+    <None Include="..\..\source\01_project_skeleton\resources\skybox.vs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\source\01_project_skeleton\resources\skybox\back.jpg" />
+    <Image Include="..\..\source\01_project_skeleton\resources\skybox\bottom.jpg" />
+    <Image Include="..\..\source\01_project_skeleton\resources\skybox\front.jpg" />
+    <Image Include="..\..\source\01_project_skeleton\resources\skybox\left.jpg" />
+    <Image Include="..\..\source\01_project_skeleton\resources\skybox\right.jpg" />
+    <Image Include="..\..\source\01_project_skeleton\resources\skybox\top.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

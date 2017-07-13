@@ -14,14 +14,20 @@
 #include "LCamera.h"
 #include "ModelReader/LMModel.h"
 
+#include <SOIL.h>
+#include "platform.hpp"
+
 const GLfloat pointLightSpeed = 1.5;
 
 extern glm::vec3 g_lightPos;
 extern LShader *g_LShaderObj;
 extern LShader *g_cubeShader;
 extern LShader *g_lightShader;
+extern LShader *g_skyboxShader;
 
 LCamera *pCameraObj = nullptr;
+
+GLuint skyboxVAO, skyboxVBO;
 
 bool keys_status[1024];
 GLfloat deltaTime = 0.f;
@@ -127,6 +133,123 @@ void mouse_callback(GLFWwindow *window, double pos_x, double pos_y) {
 	pCameraObj->rotateByMouse(offset_x, offset_y);
 }
 
+//加载立方体贴图
+GLuint loadCubeMap(vector<const GLchar*> faces)
+{
+	GLuint textureID;
+	glGenTextures(1, &textureID);
+
+	int width, height = 0;
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+	for (GLuint i = 0; i < faces.size(); i++)
+	{
+		unsigned char* image = SOIL_load_image(faces[i], &width, &height, 0, SOIL_LOAD_RGB);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+		SOIL_free_image_data(image);
+		image = nullptr;
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+	return textureID;
+}
+
+//创建天空盒
+GLuint createSkyBox()
+{
+	vector<const GLchar*> faces 
+	{
+		ResourcePath("skybox\\right.jpg").c_str(),
+		ResourcePath("skybox\\left.jpg").c_str(),
+		ResourcePath("skybox\\top.jpg").c_str(),
+		ResourcePath("skybox\\bottom.jpg").c_str(),
+		ResourcePath("skybox\\back.jpg").c_str(),
+		ResourcePath("skybox\\front.jpg").c_str()
+	};
+	GLuint cubemapTexture = loadCubeMap(faces);
+
+	float skyboxVertices[] = {
+		// positions          
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		-1.0f,  1.0f, -1.0f,
+		1.0f,  1.0f, -1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		1.0f, -1.0f,  1.0f
+	};
+	
+	glGenVertexArrays(1, &skyboxVAO);
+	glBindVertexArray(skyboxVAO);
+
+	glGenBuffers(1, &skyboxVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+	glEnableVertexAttribArray(0);
+	glBindVertexArray(0);
+
+	return cubemapTexture;
+}
+
+void readerSkybox(GLuint cubemapTexture)
+{
+	glDepthMask(GL_FALSE);
+
+	g_skyboxShader->useProgram();
+	glm::mat4 view = glm::mat4(glm::mat3(pCameraObj->getProjectionMat()));
+	glm::mat4 projection = glm::perspective(45.0f, (WindowWidth / WindwoHeight), 0.1f, 100.f);
+	glUniformMatrix4fv(glGetUniformLocation(g_skyboxShader->getShaderProgram(), "view"), 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(glGetUniformLocation(g_skyboxShader->getShaderProgram(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+	glUniform1i(glGetUniformLocation(g_skyboxShader->getShaderProgram(), "skybox"), 0);
+
+	glBindVertexArray(skyboxVAO);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
+	glDepthMask(GL_TRUE);
+}
+
 void readerModel(LCamera *in_pCameraObj, LShader *in_pShaderPro, LMModel *in_pModelObj) {
 	in_pShaderPro->useProgram();
 
@@ -217,6 +340,8 @@ void AppMain() {
     loadModels();
 	loadTexture();
 
+	GLuint skyboxTex = createSkyBox();
+
 	LShader* pShaderPro = new LShader(SHADER_CREATE_TYPE::FILE_NAME, "renderModel.vs", "renderModel.frag");
 	LMModel* pModel = new LMModel("model\\nanosuit.obj");
 	// 启用深度测试
@@ -233,6 +358,8 @@ void AppMain() {
 
 		// 清除颜色和深度缓存
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		readerSkybox(skyboxTex);
         // draw one frame
 		renderLightSource(pCameraObj);
 		renderCube(pCameraObj);

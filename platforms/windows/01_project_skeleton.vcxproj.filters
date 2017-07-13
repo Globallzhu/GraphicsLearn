@@ -13,6 +13,9 @@
     <Filter Include="source\ModelReader">
       <UniqueIdentifier>{c075733e-1fe0-458a-802f-601314e930c9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="resources\skybox">
+      <UniqueIdentifier>{9ea358ca-ea9e-4748-90e9-e1bad3dbbc7a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="platform_windows.cpp">
@@ -96,5 +99,31 @@
     <None Include="..\..\source\01_project_skeleton\resources\renderLight.frag">
       <Filter>resources</Filter>
     </None>
+    <None Include="..\..\source\01_project_skeleton\resources\skybox.frag">
+      <Filter>resources</Filter>
+    </None>
+    <None Include="..\..\source\01_project_skeleton\resources\skybox.vs">
+      <Filter>resources</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\source\01_project_skeleton\resources\skybox\back.jpg">
+      <Filter>resources\skybox</Filter>
+    </Image>
+    <Image Include="..\..\source\01_project_skeleton\resources\skybox\bottom.jpg">
+      <Filter>resources\skybox</Filter>
+    </Image>
+    <Image Include="..\..\source\01_project_skeleton\resources\skybox\front.jpg">
+      <Filter>resources\skybox</Filter>
+    </Image>
+    <Image Include="..\..\source\01_project_skeleton\resources\skybox\left.jpg">
+      <Filter>resources\skybox</Filter>
+    </Image>
+    <Image Include="..\..\source\01_project_skeleton\resources\skybox\top.jpg">
+      <Filter>resources\skybox</Filter>
+    </Image>
+    <Image Include="..\..\source\01_project_skeleton\resources\skybox\right.jpg">
+      <Filter>resources\skybox</Filter>
+    </Image>
   </ItemGroup>
 </Project>

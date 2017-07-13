@@ -9,6 +9,7 @@ GLuint VBO = 0;
 GLuint EBO = 0;
 LShader *g_lightShader = nullptr;
 LShader *g_cubeShader = nullptr;
+LShader *g_skyboxShader = nullptr;
 LTexture g_LTexture_0;
 LTexture g_LTexture_1;
 LTexture g_LTex_woodBox;
@@ -19,6 +20,7 @@ glm::vec3 g_lightPos = glm::vec3(3.5f, 4.f, 0.f);
 void loadShaders() {
 	g_lightShader = new LShader(SHADER_CREATE_TYPE::FILE_NAME, "renderCube.vs", "renderLight.frag");
 	g_cubeShader = new LShader(SHADER_CREATE_TYPE::FILE_NAME, "renderCube.vs", "renderModel.frag");
+	g_skyboxShader = new LShader(SHADER_CREATE_TYPE::FILE_NAME, "skybox.vs", "skybox.frag");
 }
 
 void loadModels() {
