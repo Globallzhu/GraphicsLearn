@@ -359,13 +359,19 @@ void AppMain() {
 		// 清除颜色和深度缓存
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		//面剔除
+		glEnable(GL_CULL_FACE);
+
 		readerSkybox(skyboxTex);
         // draw one frame
 		renderLightSource(pCameraObj);
 		renderCube(pCameraObj);
 
 		readerModel(pCameraObj, pShaderPro, pModel);
+
+		glDisable(GL_CULL_FACE);
 		renderTrigle(pCameraObj);
+
 		calculateFrames();
 
 		// swap the display buffers (displays what was just drawn)
